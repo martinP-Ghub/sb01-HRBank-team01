@@ -28,8 +28,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 //    runtimeOnly 'org.postgresql:postgresql:42.5.0'
 
+    runtimeOnly 'com.h2database:h2'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+
     implementation 'org.mapstruct:mapstruct:1.6.3'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 
