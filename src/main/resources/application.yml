@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: HRBank-team1
+#  datasource:
+#    url: jdbc:h2:mem:testdb
+#    driver-class-name: org.postgresql.Driver
+#    username: sa
+#    password: password
+#  jpa:
+#    database-platform: org.hibernate.dialect.H2Dialect
+#  h2:
+#    console:
+#      enabled: true
