@@ -13,4 +13,11 @@ public class Backup {
 	@GeneratedValue
 	private Long id;
 
+	/**
+	 * 작업자
+	 *시작 시간
+	 *종료 시간
+	 *상태 (진행중, 완료, 실패, 건너뜀)
+	 *백업 파일
+	 */
 }

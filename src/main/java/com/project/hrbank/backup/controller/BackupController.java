@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.hrbank.backup.dto.BackupDto;
 import com.project.hrbank.backup.service.BackupService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,13 +24,14 @@ public class BackupController {
 	}
 
 	@PostMapping
-	public ResponseEntity backup() {
-		return ResponseEntity.ok().build();
+	public ResponseEntity<BackupDto> backup() {
+		BackupDto backup = backupService.backup();
+		return ResponseEntity.ok().body(backup);
 	}
 
 	@GetMapping("/latest")
 	public ResponseEntity findLatest() {
 		return ResponseEntity.ok().build();
 	}
-	
+
 }
