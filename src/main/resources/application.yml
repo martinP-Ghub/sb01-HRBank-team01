@@ -1,13 +1,30 @@
 spring:
   application:
     name: HRBank-team1
-#  datasource:
-#    url: jdbc:h2:mem:testdb
-#    driver-class-name: org.postgresql.Driver
-#    username: sa
-#    password: password
-#  jpa:
-#    database-platform: org.hibernate.dialect.H2Dialect
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/hrbank
+    username: hrbank_user
+    password: hrbank1234
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: true
+
+# Logging
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
+        type:
+          descriptor:
+            sql: trace
+
 #  h2:
 #    console:
 #      enabled: true
