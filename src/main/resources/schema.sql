@@ -10,7 +10,7 @@ CREATE TABLE departments
     department_id    BIGINT GENERATED ALWAYS AS IDENTITY,
     name             VARCHAR   NOT NULL UNIQUE,
     description      TEXT      NOT NULL,
-    established_date TIMESTAMP NOT NULL,
+    established_date DATE      NOT NULL,
     created_at       TIMESTAMP NOT NULL
 );
 
@@ -42,7 +42,7 @@ CREATE TABLE employees
     email            VARCHAR   NOT NULL UNIQUE,
     employee_number  VARCHAR   NOT NULL,
     position         VARCHAR   NOT NULL,
-    hire_date        TIMESTAMP NOT NULL,
+    hire_date        DATE      NOT NULL,
     status           VARCHAR   NOT NULL,
     created_at       TIMESTAMP NOT NULL,
     department_id    BIGINT    NOT NULL,
