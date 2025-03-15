@@ -1,23 +1,46 @@
 package com.project.hrbank.backup.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 
 @Entity
 @Table(name = "backups")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Backup {
 
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "backup_id")
 	private Long id;
 
-	/**
-	 * 작업자
-	 *시작 시간
-	 *종료 시간
-	 *상태 (진행중, 완료, 실패, 건너뜀)
-	 *백업 파일
-	 */
+	@Column(name = "worker", nullable = false)
+	private String worker;
+
+	@Column(name = "started_at", nullable = false)
+	private LocalDateTime startedAt;
+
+	@Column(name = "ended_at")
+	private LocalDateTime endedAt;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "status", nullable = false)
+	private Status status;
+
+	@CreatedDate
+	@Column(name = "created_at", nullable = false, updatable = false)
+	private LocalDateTime createdAt;
+
+	// file_id 연관관계 맺기 1..0 : 1 여기가 주인임!
+
+
 }
