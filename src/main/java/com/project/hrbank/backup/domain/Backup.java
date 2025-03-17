@@ -71,4 +71,8 @@ public class Backup {
 		return new Backup(clientIpAddr, status, LocalDateTime.now(), null);
 	}
 
+	public void update(LocalDateTime endedAt, Status status) {
+		this.endedAt = endedAt;
+		this.status = status;
+	}
 }
