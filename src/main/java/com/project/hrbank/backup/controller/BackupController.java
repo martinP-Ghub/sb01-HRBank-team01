@@ -43,7 +43,7 @@ public class BackupController {
 	@PostMapping
 	public ResponseEntity<BackupDto> backup(HttpServletRequest request) {
 		String clientIpAddr = request.getRemoteAddr();
-		BackupDto backup = backupService.backup();
+		BackupDto backup = backupService.backup(clientIpAddr);
 		return ResponseEntity.ok().body(backup);
 	}
 

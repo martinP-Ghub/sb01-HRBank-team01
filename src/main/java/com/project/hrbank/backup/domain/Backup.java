@@ -28,7 +28,6 @@ public class Backup {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "backup_id")
-	@Getter
 	private Long id;
 
 	@Column(name = "worker", nullable = false)
@@ -50,10 +49,26 @@ public class Backup {
 
 	// file_id 연관관계 맺기 1..0 : 1 여기가 주인임!
 
-	public Backup(String worker, Status status) {
+	public Backup(String worker, Status status, LocalDateTime startedAt, LocalDateTime endedAt) {
 		this.worker = worker;
 		this.status = status;
-		this.startedAt = LocalDateTime.now();
+		this.startedAt = startedAt;
+		this.endedAt = endedAt;
+	}
+
+	public static Backup ofSystem() {
+		Status status = Status.COMPLETED;
+		return new Backup("system", status, LocalDateTime.now(), LocalDateTime.now());
+	}
+
+	public static Backup ofSkipped(String clientIpAddr) {
+		Status status = Status.SKIPPED;
+		return new Backup(clientIpAddr, status, LocalDateTime.now(), LocalDateTime.now());
+	}
+
+	public static Backup ofInProgress(String clientIpAddr) {
+		Status status = Status.IN_PROGRESS;
+		return new Backup(clientIpAddr, status, LocalDateTime.now(), null);
 	}
 
 }
