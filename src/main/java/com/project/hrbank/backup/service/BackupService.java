@@ -1,9 +1,13 @@
 package com.project.hrbank.backup.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,9 +25,24 @@ public class BackupService {
 
 	private final BackupRepository backupRepository;
 
-	public CursorPageResponseBackupDto findAll() {
+	public CursorPageResponseBackupDto findAll(LocalDateTime cursor, Pageable pageable) {
+		Slice<Backup> slice = backupRepository.findAllBy(Optional.ofNullable(cursor).orElse(LocalDateTime.now()), pageable);
 
-		return new CursorPageResponseBackupDto();
+		List<BackupDto> content = slice.getContent()
+			.stream()
+			.map(this::toDto)
+			.toList();
+
+		boolean hasNext = slice.hasNext();
+
+		LocalDateTime nextCursor = null;
+		if (!slice.getContent().isEmpty()) {
+			nextCursor = slice.getContent().get(slice.getContent().size() - 1).getCreatedAt();
+		}
+
+		Long nextIdAfter = hasNext ? content.get(content.size() - 1).id() : null;
+		long count = backupRepository.count();
+		return new CursorPageResponseBackupDto(content, nextCursor, nextIdAfter, content.size(), hasNext, count);
 	}
 
 	@Transactional
@@ -43,7 +62,7 @@ public class BackupService {
 		// 5 - 2 백업이 실패 => 상태 = 실패, 종료 시간 = 현재 시간, 백업 파일 = 에러 로그 파일 정보
 		// 5 - 2 - 1 생성하던 CSV 파일 삭제한다.
 		// 5 - 2 - 2 .log 파일에 에러 로그를 저장한다. {상태} : 실패, {종료 시간} : 현재 시간, {백업 파일} : 에러 로그 파일 정보
-		return new BackupDto();
+		return null;
 	}
 
 	public BackupDto findLatest() {
@@ -54,21 +73,14 @@ public class BackupService {
 	}
 
 	private BackupDto toDto(Backup backup) {
-		return new BackupDto();
+		return BackupDto.toDto(backup);
 	}
+
 }
 
 /**
  * **배치에 의한 데이터 백업**
- <<<<<<< HEAD
  * <p>
  * - 데이터 백업 프로세스를 일정한 주기(1시간)마다 자동으로 반복합니다. - 배치 주기는 애플리케이션 설정을 통해 주입할 수 있어야 합니다. - `Spring Scheduler`를 활용해 구현하세요. -
  * **{작업자}**는 `system`으로 입력합니다.
- =======
- *
- * - 데이터 백업 프로세스를 일정한 주기(1시간)마다 자동으로 반복합니다.
- *     - 배치 주기는 애플리케이션 설정을 통해 주입할 수 있어야 합니다.
- *     - `Spring Scheduler`를 활용해 구현하세요.
- * - **{작업자}**는 `system`으로 입력합니다.
- >>>>>>> a5b731b (레이어별 필요한 클래스 파일 작성)
  */

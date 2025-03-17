@@ -15,8 +15,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @Entity
 @Table(name = "backups")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -26,6 +28,7 @@ public class Backup {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "backup_id")
+	@Getter
 	private Long id;
 
 	@Column(name = "worker", nullable = false)
