@@ -28,5 +28,6 @@ logging:
 #  h2:
 #    console:
 #      enabled: true
+
 schedule:
   backup-cron: "0 0 0/1 * * *"
