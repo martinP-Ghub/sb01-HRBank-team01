@@ -89,8 +89,7 @@ CREATE TABLE employee_change_logs
     ip              VARCHAR   NOT NULL,
     changed_at      TIMESTAMP NOT NULL,
     changed_value   jsonb,
-    employee_number VARCHAR,
-    created_at      TIMESTAMP NOT NULL
+    employee_number VARCHAR
 );
 
 ALTER TABLE employee_change_logs

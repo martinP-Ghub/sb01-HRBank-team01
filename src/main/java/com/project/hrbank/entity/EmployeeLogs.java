@@ -32,8 +32,8 @@ public class EmployeeLogs {
 	@Column(nullable = false)
 	private String memo;
 
-	@Column(nullable = false)
-	private String ip;
+	@Column(name = "ip", nullable = false)
+	private String ipAddress;
 
 	@Column(name = "changed_at")
 	private LocalDateTime changedAt;

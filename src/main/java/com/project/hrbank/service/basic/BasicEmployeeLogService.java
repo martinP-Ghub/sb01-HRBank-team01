@@ -8,16 +8,17 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.project.hrbank.dto.requset.EmployeeLogRequest;
 import com.project.hrbank.dto.response.EmployeeLogResponse;
 import com.project.hrbank.entity.EmployeeLogs;
 import com.project.hrbank.mapper.EmployeeLogMapper;
 import com.project.hrbank.repository.EmployeeLogRepository;
 import com.project.hrbank.service.EmployeeLogService;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class BasicEmployeeLogService implements EmployeeLogService {
 	private final EmployeeLogRepository repository;
 
@@ -31,7 +32,7 @@ public class BasicEmployeeLogService implements EmployeeLogService {
 	// public List<EmployeeLogResponse> getLogs(String sortField, String sortDirection, int size) {
 	public Map<String, Object> getLogs(String sortField, String sortDirection, int size) {
 		// 요청 필드를 DB 필드로 변환
-		String mappedField = FIELD_MAP.getOrDefault(sortField, "changedAt");
+		String mappedField = FIELD_MAP.getOrDefault(sortField, "changed_at");
 
 		// 정렬 방향 설정
 		Sort.Direction direction = sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
@@ -50,11 +51,32 @@ public class BasicEmployeeLogService implements EmployeeLogService {
 		result.put("content", responses);
 
 		return result;
+	}
 
-		// List<EmployeeLogs> employeeLogs = repository.findAll();
-		// List<EmployeeLogResponse> responses = employeeLogs.stream()
-		// 	.map(employeeLog -> EmployeeLogMapper.INSTANT.toDto(employeeLog))
-		// 	.collect(Collectors.toList());
-		// return responses;
+	@Override
+	public String getLogById(Long id) {
+
+		try {
+			EmployeeLogs response = repository.findById(id)
+				.orElseThrow(() -> new IllegalArgumentException("저장되지 않았거나, 삭제된 아이디입니다." + id));
+
+			String diff = response.getChangedValue();
+
+			return diff;
+		} catch (NullPointerException e) {
+			throw new NullPointerException("ID를 찾을 수 없습니다." + e.getMessage());
+		}
+	}
+
+	@Override
+	public Integer getLogCount() {
+		return repository.findAll().size();
+	}
+
+	@Override
+	public EmployeeLogResponse createLog(EmployeeLogRequest request) {
+		EmployeeLogs log = EmployeeLogMapper.INSTANT.toEntity(request);
+
+		return EmployeeLogMapper.INSTANT.toDto(repository.save(log));
 	}
 }
