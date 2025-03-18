@@ -17,6 +17,7 @@ public class CsvProvider {
 
     public static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
     public static final String BACKUP_FILE_NAME = "backup_employee_";
+    public static final String CSV_HEADER_CONTENT = "ID,직원번호,이름,부서,직급,입사일,상태";
 
     private final EmployeeRepository employeeRepository;
 
@@ -27,17 +28,21 @@ public class CsvProvider {
 
     public byte[] loadEmployeeData() {
         PrintWriter printWriter = new PrintWriter(new StringWriter());
-        printWriter.println("ID,직원번호,이름,부서,직급,입사일,상태");
+        printWriter.println(CSV_HEADER_CONTENT);
         List<Employee> employees = employeeRepository.findAll();
-        employees.forEach(employee -> {
-            writeEmployeeInfo(employee, printWriter);
-        });
+        employees.forEach(employee -> writeEmployeeInfo(employee, printWriter));
         return printWriter.toString().getBytes(StandardCharsets.UTF_8);
     }
 
     private void writeEmployeeInfo(Employee employee, PrintWriter printWriter) {
-        printWriter.printf("%d, %s, %s, %s, %s, %s, %s\n", employee.getEmployeeId(), employee.getEmployeeNumber(),
+        printWriter.printf("%d, %s, %s, %s, %s, %s, %s\n",
+                employee.getEmployeeId(),
+                employee.getEmployeeNumber(),
                 employee.getName(),
-                employee.getDepartmentId(), employee.getPosition(), employee.getHireDate(), employee.getStatus());
+                employee.getDepartmentId(),
+                employee.getPosition(),
+                employee.getHireDate(),
+                employee.getStatus()
+        );
     }
 }
