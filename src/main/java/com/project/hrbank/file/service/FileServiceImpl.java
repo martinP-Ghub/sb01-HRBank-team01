@@ -21,20 +21,37 @@ public class FileServiceImpl implements FileService {
 	private final FileHandlerFactory fileHandlerFactory;
 
 	@Override
-	public FileEntity saveFile(MultipartFile file) throws IOException {
+	public FileEntity saveMultipartFile(MultipartFile file) throws IOException {
 		if (file.isEmpty()) {
 			throw new IllegalArgumentException("업로드 파일이 비어있습니다.");
 		}
 
 		String fileName = (file.getOriginalFilename() != null) ? file.getOriginalFilename() : "unknown_file";
 		FileHandler fileHandler = fileHandlerFactory.getFileHandler(fileName);
-		byte[] processedFileData = fileHandler.processFile(file);
+		byte[] processedFileData = fileHandler.processMultipartFile(file);
 
 		FileEntity fileEntity = fileStorage.saveFile(
 			null,
 			processedFileData,
 			file.getOriginalFilename(),
 			file.getContentType()
+		);
+		return fileRepository.save(fileEntity);
+	}
+
+	@Override
+	public FileEntity saveFileData(String fileName, byte[] fileData, String contentType) throws IOException {
+		if(fileData == null || fileData.length == 0){
+			throw new IllegalArgumentException("파일 데이터가 비어 있습니다.");
+		}
+		FileHandler fileHandler = fileHandlerFactory.getFileHandler(fileName);
+		byte[] processedFileData = fileHandler.processFileData(fileName, fileData);
+
+		FileEntity fileEntity = fileStorage.saveFile(
+			null,
+			processedFileData,
+			fileName,
+			contentType
 		);
 		return fileRepository.save(fileEntity);
 	}
@@ -55,7 +72,7 @@ public class FileServiceImpl implements FileService {
 
 		String fileName = (newFile.getOriginalFilename() != null) ? newFile.getOriginalFilename() : "unknown_file";
 
-		byte[] processedFileData = fileHandlerFactory.getFileHandler(fileName).processFile(newFile);
+		byte[] processedFileData = fileHandlerFactory.getFileHandler(fileName).processMultipartFile(newFile);
 
 		FileEntity updateFile = fileStorage.saveFile(
 			null,
