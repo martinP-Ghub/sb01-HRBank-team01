@@ -4,19 +4,14 @@ import com.project.hrbank.backup.domain.Backup;
 import com.project.hrbank.backup.domain.Status;
 import com.project.hrbank.backup.dto.response.BackupDto;
 import com.project.hrbank.backup.dto.response.CursorPageResponseBackupDto;
+import com.project.hrbank.backup.provider.CsvProvider;
 import com.project.hrbank.backup.repository.BackupRepository;
 import com.project.hrbank.backup.repository.BackupRepositoryImpl;
-import com.project.hrbank.entity.Employee;
 import com.project.hrbank.file.entity.FileEntity;
-import com.project.hrbank.file.repository.FileRepository;
 import com.project.hrbank.file.storage.FileStorage;
 import com.project.hrbank.repository.EmployeeLogRepository;
 import com.project.hrbank.repository.EmployeeRepository;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -38,7 +33,7 @@ public class BackupService {
     private final BackupRepositoryImpl backupRepositoryImpl;
     private final FileStorage fileStorage;
     private final EmployeeRepository employeeRepository;
-    private final FileRepository fileRepository;
+    private final CsvProvider csvProvider;
 
     public CursorPageResponseBackupDto findAll(LocalDateTime cursor, Pageable pageable) {
         cursor = Optional.ofNullable(cursor).orElse(LocalDateTime.now());
@@ -94,37 +89,6 @@ public class BackupService {
         return toDto(backup);
     }
 
-    private FileEntity generateBackupFile() {
-        String fileName = generateFileName();
-        byte[] employeeData = loadEmployeeData();
-        String contentType = ".csv";
-        return fileStorage.saveFile(null, employeeData, fileName, contentType);
-    }
-
-    private byte[] loadEmployeeData() {
-        PrintWriter printWriter = new PrintWriter(new StringWriter());
-        printWriter.println("ID,직원번호,이름,부서,직급,입사일,상태");
-        List<Employee> employees = employeeRepository.findAll();
-        employees.forEach(employee -> {
-            writeEmployeeInfo(employee, printWriter);
-        });
-        return printWriter.toString().getBytes(StandardCharsets.UTF_8);
-    }
-
-    private void writeEmployeeInfo(Employee employee, PrintWriter printWriter) {
-        printWriter.printf("%d, %s, %s, %s, %s, %s, %s\n", employee.getEmployeeId(), employee.getEmployeeNumber(),
-                employee.getName(),
-                employee.getDepartmentId(), employee.getPosition(), employee.getHireDate(), employee.getStatus());
-    }
-
-    private String generateFileName() {
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
-        String formattedDateTime = now.format(formatter);
-        return "backup_employee_" + formattedDateTime;
-    }
-
-
     private LocalDateTime getLastEndedAt() {
         return backupRepository.findLastBackup().stream()
                 .findFirst()
@@ -132,9 +96,15 @@ public class BackupService {
                 .orElse(POSTGRESQL_MIN_TIMESTAMP);
     }
 
-
     private boolean isNotChangedEmployeeInfo(LocalDateTime endedAt) {
         return !employeeLogRepository.existsByChangedAtAfter(endedAt);
+    }
+
+    private FileEntity generateBackupFile() {
+        String fileName = csvProvider.generateFileName();
+        byte[] employeeData = csvProvider.loadEmployeeData();
+        String contentType = ".csv";
+        return fileStorage.saveFile(null, employeeData, fileName, contentType);
     }
 
     public BackupDto findLatest() {
