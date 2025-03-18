@@ -14,4 +14,5 @@ public interface EmployeeLogService {
 	Integer getLogCount();
 
 	EmployeeLogResponse createLog(EmployeeLogRequest request);
+
 }
