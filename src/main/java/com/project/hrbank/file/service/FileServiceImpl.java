@@ -27,8 +27,6 @@ public class FileServiceImpl implements FileService {
 		}
 
 		String fileName = (file.getOriginalFilename() != null) ? file.getOriginalFilename() : "unknown_file";
-
-
 		FileHandler fileHandler = fileHandlerFactory.getFileHandler(fileName);
 		byte[] processedFileData = fileHandler.processFile(file);
 
