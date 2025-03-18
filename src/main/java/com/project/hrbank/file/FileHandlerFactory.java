@@ -9,6 +9,7 @@ import com.project.hrbank.file.handler.FileHandler;
 @Component
 public class FileHandlerFactory {
 	private final List<FileHandler> fileHandlers;
+
 	public FileHandlerFactory(List<FileHandler> fileHandlers) {
 		this.fileHandlers = fileHandlers;
 	}
