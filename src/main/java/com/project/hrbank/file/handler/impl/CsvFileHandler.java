@@ -26,12 +26,11 @@ public class CsvFileHandler implements FileHandler {
 	}
 
 	@Override
-	public void processFile(MultipartFile file) throws IOException {
+	public byte[] processFile(MultipartFile file) throws IOException {
 		Path filePath = Paths.get(CSV_STORAGE_PATH + file.getOriginalFilename());
 		Files.createDirectories(filePath.getParent());
 
-		FileConverter.convertToUtf8(file, filePath);
-
+		return FileConverter.convertToUtf8(file, filePath);
 	}
 
 	@Override

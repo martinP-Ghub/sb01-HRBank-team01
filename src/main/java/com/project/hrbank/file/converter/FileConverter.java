@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import org.springframework.web.multipart.MultipartFile;
 
 public class FileConverter {
-	public static void convertToUtf8(MultipartFile file, Path filePath) throws IOException {
+	public static byte[] convertToUtf8(MultipartFile file, Path filePath) throws IOException {
 		try (BufferedReader reader = new BufferedReader(
 			new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8));
 			 BufferedWriter writer = new BufferedWriter(
@@ -23,6 +23,8 @@ public class FileConverter {
 				writer.newLine();
 			}
 		}
+		return Files.readAllBytes(filePath);
+
 	}
 
 }

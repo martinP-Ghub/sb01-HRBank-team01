@@ -18,11 +18,12 @@ public interface FileHandler {
 	boolean supports(String extension);
 
 	/**
-	 *
-	 * @param file 업로드할 파일
+	 * 파일 처리 후 가공된 파일 데이터 반환
+	 * @param file 업로드 할 파일
+	 * @return 처리된 파일의 바이트 배열
 	 * @throws IOException 파일 처리 중 오류 발생
 	 */
-	void processFile(MultipartFile file) throws IOException;
+	byte[] processFile(MultipartFile file) throws IOException;
 
 	/**
 	 * @param filePath 파일 경로

@@ -25,11 +25,12 @@ public class LogFileHandler implements FileHandler {
 		return extension.equalsIgnoreCase("log");	}
 
 	@Override
-	public void processFile(MultipartFile file) throws IOException {
+	public byte[] processFile(MultipartFile file) throws IOException {
 		Path filePath = Paths.get(LOG_STORAGE_PATH + file.getOriginalFilename());
 		Files.createDirectories(filePath.getParent());
 
-		FileConverter.convertToUtf8(file, filePath);
+		return FileConverter.convertToUtf8(file, filePath);
+
 	}
 
 	@Override
