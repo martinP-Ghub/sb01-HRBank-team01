@@ -38,6 +38,4 @@ public interface FileService {
 	 */
 	void deleteFile(Long fileId);
 
-
-
 }
