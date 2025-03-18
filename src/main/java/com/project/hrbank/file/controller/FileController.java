@@ -1,6 +1,5 @@
 package com.project.hrbank.file.controller;
 
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,7 +20,6 @@ public class FileController {
 
 	private final FileService fileService;
 	private final FileStorage fileStorage;
-
 
 	@GetMapping("/{id}/download")
 	public ResponseEntity<?> download(@PathVariable Long id) {

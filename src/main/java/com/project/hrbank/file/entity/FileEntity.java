@@ -41,7 +41,7 @@ public class FileEntity {
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 
-	public FileEntity(Long id , String fileName, String contentType, Long size, String filePath) {
+	public FileEntity(Long id, String fileName, String contentType, Long size, String filePath) {
 		this.id = id;
 		this.fileName = fileName;
 		this.contentType = contentType;
@@ -49,6 +49,5 @@ public class FileEntity {
 		this.filePath = filePath;
 		this.createdAt = LocalDateTime.now();
 	}
-
 
 }

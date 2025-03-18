@@ -19,14 +19,15 @@ public class LocalFileStorage implements FileStorage {
 	private static final String STORAGE_PATH = "files/";
 
 	@Override
-	public FileEntity saveFile(Long id, byte[] fileData, String fileName, String contentType ) {
+	public FileEntity saveFile(Long id, byte[] fileData, String fileName, String contentType) {
 		try {
 			Path filePath = Paths.get(STORAGE_PATH + id);
 			Files.createDirectories(filePath.getParent());
 			Files.write(filePath, fileData);
+
 			long fileSize = Files.size(filePath);
 			return new FileEntity(id, fileName, contentType, fileSize, filePath.toString());
-		}catch (IOException e){
+		} catch (IOException e) {
 			throw new RuntimeException("파일 저장 실패", e);
 		}
 	}
@@ -39,7 +40,7 @@ public class LocalFileStorage implements FileStorage {
 				throw new FileNotFoundException("파일을 찾을 수 없습니다: " + id);
 			}
 			return Files.newInputStream(filePath);
-		}catch (IOException e){
+		} catch (IOException e) {
 			throw new RuntimeException("파일 조회 실패", e);
 		}
 	}
@@ -51,7 +52,7 @@ public class LocalFileStorage implements FileStorage {
 			return ResponseEntity.ok()
 				.header("Content-Disposition", "attachment; filename=\"" + fileDto.fileName() + "\"")
 				.body(new InputStreamResource(fileStream));
-		}catch (Exception e){
+		} catch (Exception e) {
 			return ResponseEntity.status(500).body("파일 다운로드 실패");
 		}
 	}
@@ -61,8 +62,8 @@ public class LocalFileStorage implements FileStorage {
 		try {
 			Path filePath = Paths.get(STORAGE_PATH + id);
 			return Files.deleteIfExists(filePath);
-		}catch (IOException e){
-			throw new RuntimeException("파일 삭제 실패" ,e);
+		} catch (IOException e) {
+			throw new RuntimeException("파일 삭제 실패", e);
 		}
 	}
 }
