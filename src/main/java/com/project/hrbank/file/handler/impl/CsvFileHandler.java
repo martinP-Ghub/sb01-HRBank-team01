@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.project.hrbank.file.converter.FileConverter;
 import com.project.hrbank.file.entity.FileEntity;
 import com.project.hrbank.file.handler.FileHandler;
 
@@ -29,14 +30,8 @@ public class CsvFileHandler implements FileHandler {
 		Path filePath = Paths.get(CSV_STORAGE_PATH + file.getOriginalFilename());
 		Files.createDirectories(filePath.getParent());
 
-		try(BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8));
-			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(filePath), StandardCharsets.UTF_8))) {
-			String line;
-			while ((line = reader.readLine()) != null) {
-				writer.write(line);
-				writer.newLine();
-			}
-		}
+		FileConverter.convertToUtf8(file, filePath);
+
 	}
 
 	@Override
