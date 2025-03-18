@@ -70,25 +70,25 @@ public class Backup {
 		return new Backup("system", status, LocalDateTime.now(), LocalDateTime.now());
 	}
 
-	public static Backup ofSkipped(String clientIpAddr) {
-		Status status = Status.SKIPPED;
-		return new Backup(clientIpAddr, status, LocalDateTime.now(), LocalDateTime.now());
-	}
-
 	public static Backup ofInProgress(String clientIpAddr) {
 		Status status = Status.IN_PROGRESS;
 		return new Backup(clientIpAddr, status, LocalDateTime.now(), null);
 	}
 
-	public void update(LocalDateTime endedAt, Status status) {
-		this.endedAt = endedAt;
-		this.status = status;
+	public void updateSkipped() {
+		this.endedAt = LocalDateTime.now();
+		this.status = Status.SKIPPED;
 	}
 
-	public void update(LocalDateTime endedAt, Status status, FileEntity files) {
-		this.endedAt = endedAt;
-		this.status = status;
-		this.files = files;
+	public void updateFailed() {
+		this.endedAt = LocalDateTime.now();
+		this.status = Status.FAILED;
+	}
+
+	public void updateCompleted(FileEntity file) {
+		this.endedAt = LocalDateTime.now();
+		this.status = Status.COMPLETED;
+		this.files = file;
 	}
 
 }
