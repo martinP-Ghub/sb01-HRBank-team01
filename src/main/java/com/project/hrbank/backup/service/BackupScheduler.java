@@ -9,12 +9,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BackupScheduler {
 
-	private final BackupService backupService;
+	private BackupService backupService;
 
 	// application 설정으로 주입 받기
 	@Scheduled(cron = "${schedule.backup-cron:data}")
 	public void scheduledBackup() {
-//		backupService.backup();
+		backupService.backupBySystem();
 	}
 
 }
