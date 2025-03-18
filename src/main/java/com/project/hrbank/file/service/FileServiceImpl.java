@@ -42,12 +42,12 @@ public class FileServiceImpl implements FileService {
 	@Override
 	public FileEntity find(Long fileId) {
 		return fileRepository.findById(fileId)
-				.orElseThrow(() -> new IllegalArgumentException("파일을 찾을 수 없습니다: " + fileId));
+			.orElseThrow(() -> new IllegalArgumentException("파일을 찾을 수 없습니다: " + fileId));
 	}
 
 	@Override
 	public FileEntity updateFile(Long fileId, MultipartFile newFile) throws IOException {
-		if(newFile.isEmpty()) {
+		if (newFile.isEmpty()) {
 			throw new IllegalArgumentException("업로드된 새 파일이 비어있습니다.");
 		}
 		FileEntity existFile = find(fileId);

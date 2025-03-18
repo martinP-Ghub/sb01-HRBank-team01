@@ -1,11 +1,6 @@
 package com.project.hrbank.file.handler.impl;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,7 +17,8 @@ public class LogFileHandler implements FileHandler {
 
 	@Override
 	public boolean supports(String extension) {
-		return extension.equalsIgnoreCase("log");	}
+		return extension.equalsIgnoreCase("log");
+	}
 
 	@Override
 	public byte[] processFile(MultipartFile file) throws IOException {

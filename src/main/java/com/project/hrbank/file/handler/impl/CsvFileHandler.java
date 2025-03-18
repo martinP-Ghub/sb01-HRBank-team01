@@ -1,11 +1,6 @@
 package com.project.hrbank.file.handler.impl;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,7 +13,6 @@ import com.project.hrbank.file.handler.FileHandler;
 
 public class CsvFileHandler implements FileHandler {
 	private static final String CSV_STORAGE_PATH = "files/csv/";
-
 
 	@Override
 	public boolean supports(String extension) {
@@ -35,10 +29,10 @@ public class CsvFileHandler implements FileHandler {
 
 	@Override
 	public FileEntity handleDownload(Path filePath, String fileName) throws IOException {
-		if(!Files.exists(filePath) || !Files.isReadable(filePath)) {
+		if (!Files.exists(filePath) || !Files.isReadable(filePath)) {
 			throw new IOException("파일을 읽을 수 없습니다 : " + fileName);
 		}
 
-		return new FileEntity(null, fileName, "text/csv", Files.size(filePath),filePath.toString());
+		return new FileEntity(null, fileName, "text/csv", Files.size(filePath), filePath.toString());
 	}
 }

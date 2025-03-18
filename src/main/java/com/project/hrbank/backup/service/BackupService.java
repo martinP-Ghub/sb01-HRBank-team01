@@ -16,7 +16,6 @@ import com.project.hrbank.backup.dto.response.BackupDto;
 import com.project.hrbank.backup.dto.response.CursorPageResponseBackupDto;
 import com.project.hrbank.backup.repository.BackupRepository;
 import com.project.hrbank.backup.repository.BackupRepositoryImpl;
-import com.project.hrbank.file.entity.FileEntity;
 import com.project.hrbank.repository.EmployeeLogRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -85,15 +84,15 @@ public class BackupService {
 			return toDto(backup);
 		}
 
-		backup.updateCompleted(createFileTemp());
+		backup.updateCompleted(null);
 		// file repository 를 이용해서 저장된 파일의 메타데이터를 넘겨서 저장한다.
 		return toDto(backup);
 	}
 
 	// 임시로 만들어둠. 이후 지워야함
-	private FileEntity createFileTemp() {
+/*	private FileEntity createFileTemp() {
 		return new FileEntity("test", "csv", 10L, "test");
-	}
+	}*/
 
 	private LocalDateTime getLastEndedAt() {
 		return backupRepository.findLastBackup().stream()

@@ -1,15 +1,15 @@
 package com.project.hrbank.service;
 
-import com.project.hrbank.dto.DepartmentDto;
-
 import java.util.List;
 
+import com.project.hrbank.dto.DepartmentDto;
+
 public interface DepartmentService {
-    DepartmentDto createDepartment(DepartmentDto dto);
+	DepartmentDto createDepartment(DepartmentDto dto);
 
-    List<DepartmentDto> getAllDepartments();
+	List<DepartmentDto> getAllDepartments();
 
-    DepartmentDto updateDepartment(Long id, DepartmentDto dto);
+	DepartmentDto updateDepartment(Long id, DepartmentDto dto);
 
-    void deleteDepartment(Long id);
+	void deleteDepartment(Long id);
 }
