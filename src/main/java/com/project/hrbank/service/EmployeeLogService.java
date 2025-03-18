@@ -13,7 +13,7 @@ public interface EmployeeLogService {
 
 	String getLogById(Long id);
 
-	Integer getLogCount();
+	long getLogCount();
 
 	EmployeeLogResponse createLog(EmployeeLogRequest request);
 

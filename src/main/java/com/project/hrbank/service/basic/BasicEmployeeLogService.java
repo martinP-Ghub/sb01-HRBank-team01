@@ -1,11 +1,8 @@
 package com.project.hrbank.service.basic;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.project.hrbank.dto.request.EmployeeLogRequest;
@@ -14,6 +11,7 @@ import com.project.hrbank.dto.response.EmployeeLogResponse;
 import com.project.hrbank.entity.EmployeeLogs;
 import com.project.hrbank.mapper.EmployeeLogMapper;
 import com.project.hrbank.repository.EmployeeLogRepository;
+import com.project.hrbank.service.CursorPaginationService;
 import com.project.hrbank.service.EmployeeLogService;
 
 import jakarta.transaction.Transactional;
@@ -23,34 +21,20 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BasicEmployeeLogService implements EmployeeLogService {
 	private final EmployeeLogRepository repository;
+	private final CursorPaginationService paginationService;
 
 	@Override
 	@Transactional
 	public CursorPageResponse<EmployeeLogResponse> getLogs(LocalDateTime cursor, Pageable pageable) {
-		cursor = Optional.ofNullable(cursor)
-			.orElse(LocalDateTime.now());
-
-		Slice<EmployeeLogs> slice = repository.findAllBy(cursor, pageable);
-
-		List<EmployeeLogResponse> content = slice.getContent()
-			.stream()
-			.map(EmployeeLogMapper.INSTANT::toDto)
-			.toList();
-
-		LocalDateTime nextCursor = null;
-		if (!slice.getContent().isEmpty()) {
-			nextCursor = slice.getContent().get(slice.getContent().size() - 1).getChangedAt();
-		}
-
-		Long nextIdAfter = null;
-		if (slice.hasNext()) {
-			nextIdAfter = content.get(content.size() - 1).id();
-		}
-
-		long count = repository.count();
-
-		return new CursorPageResponse<EmployeeLogResponse>(content, nextCursor, nextIdAfter, content.size(),
-			slice.hasNext(), count);
+		return paginationService.getPaginatedResults(
+			cursor,
+			pageable,
+			repository,
+			EmployeeLogMapper.INSTANT::toDto,
+			EmployeeLogs::getChangedAt,
+			EmployeeLogs::getLog_id,
+			repository::findAll
+		);
 	}
 
 	@Override
@@ -69,8 +53,8 @@ public class BasicEmployeeLogService implements EmployeeLogService {
 	}
 
 	@Override
-	public Integer getLogCount() {
-		return repository.findAll().size();
+	public long getLogCount() {
+		return repository.count();
 	}
 
 	@Override

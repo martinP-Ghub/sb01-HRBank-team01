@@ -36,7 +36,7 @@ public class EmployeeLogRestController {
 
 	/**
 	 *
-	 * @param sortField - 정렬 기준
+	 * @param  - 정렬 기준
 	 * @param sortDirection - 정렬 ASC, DESC
 	 * @param size - 페이지 당 로딩 개수
 	 * @return Log List 반환
@@ -44,14 +44,15 @@ public class EmployeeLogRestController {
 	@GetMapping
 	@Operation(summary = "직원 정보 수정 이력 목록 조회", description = "직원 정보 수정 이력 목록을 조회합니다. 상세 변경 내용은 포함되지 않습니다.")
 	public CursorPageResponse<EmployeeLogResponse> getLogList(
-		@RequestParam(defaultValue = "10") int size,
-		@RequestParam(defaultValue = "at") String sortField,
+		@RequestParam(defaultValue = "") String employeeNumber,
+		@RequestParam(defaultValue = "30") int size,
+		@RequestParam(defaultValue = "at") String at,
 		@RequestParam(defaultValue = "desc") String sortDirection,
 		@RequestParam(required = false) LocalDateTime cursor
 	) {
 
 		// 정렬 필드 매핑
-		String mappedField = FIELD_MAP.getOrDefault(sortField, "changed_at");
+		String mappedField = FIELD_MAP.getOrDefault(at, "changed_at");
 
 		// 정렬 방향 설정
 		Sort.Direction direction = sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
@@ -60,7 +61,6 @@ public class EmployeeLogRestController {
 		// Pageable 설정 후 데이터 조회
 		Pageable pageable = PageRequest.of(0, size, sort);
 
-		// return service.getLogs(sortField, sortDirection, size);
 		return service.getLogs(cursor, pageable);
 	}
 
@@ -79,7 +79,7 @@ public class EmployeeLogRestController {
 	 * @return 변경된 목록 개수 반환
 	 */
 	@GetMapping("/count")
-	public Integer getLogCount() {
+	public long getLogCount() {
 		return service.getLogCount();
 	}
 }
