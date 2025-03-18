@@ -68,7 +68,7 @@ CREATE TABLE backups
     backup_id  BIGINT GENERATED ALWAYS AS IDENTITY,
     worker     VARCHAR   NOT NULL,
     started_at TIMESTAMP NOT NULL,
-    ended_at   TIMESTAMP NOT NULL,
+    ended_at   TIMESTAMP,
     status     VARCHAR   NOT NULL,
     created_at TIMESTAMP NOT NULL,
     file_id    BIGINT
