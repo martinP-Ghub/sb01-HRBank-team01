@@ -24,7 +24,7 @@ public class FileTestController {
 
 	@PostMapping("/upload")
 	public ResponseEntity<FileEntity> uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
-		return ResponseEntity.ok(fileService.saveFile(file));
+		return ResponseEntity.ok(fileService.saveMultipartFile(file));
 	}
 
 	@GetMapping("/{id}")

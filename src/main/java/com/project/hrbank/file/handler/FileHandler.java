@@ -18,11 +18,19 @@ public interface FileHandler {
 
 	/**
 	 * 파일 처리 후 가공된 파일 데이터 반환
-	 * @param file 업로드 할 파일
+	 * @param file  업로드 할 파일
 	 * @return 처리된 파일의 바이트 배열
 	 * @throws IOException 파일 처리 중 오류 발생
 	 */
-	byte[] processFile(MultipartFile file) throws IOException;
+	byte[] processMultipartFile(MultipartFile file) throws IOException;
+
+	/**
+	 *
+	 * @param fileData 업로드 할 파일 데이터
+	 * @return 처리된 파일의 바이트 배열
+	 * @throws IOException 파일 처리 중 오류 발생
+	 */
+	byte[] processFileData(String fileName, byte[] fileData) throws IOException;
 
 	/**
 	 * @param filePath 파일 경로

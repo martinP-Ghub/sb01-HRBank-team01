@@ -21,12 +21,20 @@ public class LogFileHandler implements FileHandler {
 	}
 
 	@Override
-	public byte[] processFile(MultipartFile file) throws IOException {
+	public byte[] processMultipartFile(MultipartFile file) throws IOException {
 		Path filePath = Paths.get(LOG_STORAGE_PATH + file.getOriginalFilename());
 		Files.createDirectories(filePath.getParent());
 
-		return FileConverter.convertToUtf8(file, filePath);
+		return FileConverter.processMultipartFile(file);
 
+	}
+
+	@Override
+	public byte[] processFileData(String fileName , byte[] fileData) throws IOException {
+		Path filePath = Paths.get(LOG_STORAGE_PATH + fileName);
+		Files.createDirectories(filePath.getParent());
+
+		return FileConverter.processFileData(fileData);
 	}
 
 	@Override

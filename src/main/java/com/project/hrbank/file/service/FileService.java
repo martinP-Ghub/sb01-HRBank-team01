@@ -14,7 +14,16 @@ public interface FileService {
 	 * @return 저장된 파일의 엔티티 정보
 	 * @throws IOException 파일 저장 중 오류 발생 시 예외 처리
 	 */
-	FileEntity saveFile(MultipartFile file) throws IOException;
+	FileEntity saveMultipartFile(MultipartFile file) throws IOException;
+
+	/**
+	 * @param fileName    파일 이름
+	 * @param fileData    파일 바이트 데이터
+	 * @param contentType 파일 확장자 타입
+	 * @return 저장된 파일의 엔티티 정보
+	 * @throws IOException 파일 저장 중 오류 발생 시 예외 처리
+	 */
+	FileEntity saveFileData(String fileName, byte[] fileData, String contentType) throws IOException;
 
 	/**
 	 * 파일을 조회하고 엔티티 정보 반환
