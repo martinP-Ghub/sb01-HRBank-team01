@@ -1,4 +1,4 @@
-package com.project.hrbank.file.FileConfig;
+package com.project.hrbank.file.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
