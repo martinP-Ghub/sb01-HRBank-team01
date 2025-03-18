@@ -3,12 +3,11 @@ package com.project.hrbank.dto.response;
 import java.time.LocalDateTime;
 
 public record EmployeeLogResponse(
-	Long log_id,
+	Long id,
 	String type,
 	String memo,
-	String ip,
-	LocalDateTime changedAt,
-	String changedValue,
+	String ipAddress,
+	LocalDateTime at,
 	String employeeNumber
 ) {
 }
