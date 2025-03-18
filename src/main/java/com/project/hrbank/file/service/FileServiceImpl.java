@@ -27,6 +27,7 @@ public class FileServiceImpl implements FileService {
 		}
 
 		String fileName = (file.getOriginalFilename() != null) ? file.getOriginalFilename() : "unknown_file";
+
 		FileHandler fileHandler = fileHandlerFactory.getFileHandler(fileName);
 		byte[] processedFileData = fileHandler.processFile(file);
 
@@ -47,12 +48,19 @@ public class FileServiceImpl implements FileService {
 
 	@Override
 	public FileEntity updateFile(Long fileId, MultipartFile newFile) throws IOException {
+		if(newFile.isEmpty()) {
+			throw new IllegalArgumentException("업로드된 새 파일이 비어있습니다.");
+		}
 		FileEntity existFile = find(fileId);
 		fileStorage.delete(existFile.getId());
 
+		String fileName = (newFile.getOriginalFilename() != null) ? newFile.getOriginalFilename() : "unknown_file";
+
+		byte[] processedFileData = fileHandlerFactory.getFileHandler(fileName).processFile(newFile);
+
 		FileEntity updateFile = fileStorage.saveFile(
 			null,
-			newFile.getBytes(),
+			processedFileData,
 			newFile.getOriginalFilename(),
 			newFile.getContentType()
 		);
