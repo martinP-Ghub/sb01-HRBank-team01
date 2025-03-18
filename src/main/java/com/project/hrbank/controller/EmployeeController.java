@@ -1,27 +1,26 @@
 package com.project.hrbank.controller;
 
-import java.time.LocalDate;
-
 import com.project.hrbank.dto.request.EmployeeRequestDto;
 import com.project.hrbank.dto.response.EmployeeResponseDto;
-import com.project.hrbank.entity.EmployeeStatus;
 import com.project.hrbank.service.EmployeeService;
-import com.project.hrbank.service.EmployeeServiceImpl;
+
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/employees")
 @RequiredArgsConstructor
 public class EmployeeController {
+
 	private final EmployeeService employeeService;
-	private final EmployeeServiceImpl employeeServiceImpl;
 
 	@PostMapping
 	public ResponseEntity<EmployeeResponseDto> registerEmployee(@RequestBody @Valid EmployeeRequestDto requestDto) {
@@ -44,11 +43,13 @@ public class EmployeeController {
 		return ResponseEntity.ok(employee);
 	}
 
-	@PatchMapping("/{id}")
+	@PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<EmployeeResponseDto> updateEmployee(
 		@PathVariable Long id,
-		@RequestBody EmployeeRequestDto requestDto) {
-		EmployeeResponseDto updatedEmployee = employeeService.updateEmployee(id, requestDto);
+		@RequestPart(value = "employee", required = true) EmployeeRequestDto employeeDetails,
+		@RequestPart(value = "profile", required = false) MultipartFile profileImage
+	) {
+		EmployeeResponseDto updatedEmployee = employeeService.updateEmployee(id, employeeDetails, profileImage);
 		return ResponseEntity.ok(updatedEmployee);
 	}
 
@@ -60,8 +61,7 @@ public class EmployeeController {
 
 	@GetMapping("/count")
 	public ResponseEntity<Long> countEmployees() {
-		long count = employeeServiceImpl.countActiveEmployees();
+		long count = employeeService.countActiveEmployees();
 		return ResponseEntity.ok(count);
 	}
-
 }
