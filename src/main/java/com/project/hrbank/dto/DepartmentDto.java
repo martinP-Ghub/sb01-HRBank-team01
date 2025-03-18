@@ -9,5 +9,6 @@ public record DepartmentDto(
         String description,
         LocalDate establishedDate,
         long employeeCount,
-        LocalDateTime createdAt) {
+        LocalDateTime createdAt
+) {
 }
