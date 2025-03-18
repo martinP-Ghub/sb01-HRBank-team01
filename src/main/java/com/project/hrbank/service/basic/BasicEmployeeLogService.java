@@ -1,20 +1,22 @@
 package com.project.hrbank.service.basic;
 
-import java.util.HashMap;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.project.hrbank.dto.requset.EmployeeLogRequest;
+import com.project.hrbank.dto.request.EmployeeLogRequest;
+import com.project.hrbank.dto.response.CursorPageResponse;
 import com.project.hrbank.dto.response.EmployeeLogResponse;
 import com.project.hrbank.entity.EmployeeLogs;
 import com.project.hrbank.mapper.EmployeeLogMapper;
 import com.project.hrbank.repository.EmployeeLogRepository;
 import com.project.hrbank.service.EmployeeLogService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -22,35 +24,33 @@ import lombok.RequiredArgsConstructor;
 public class BasicEmployeeLogService implements EmployeeLogService {
 	private final EmployeeLogRepository repository;
 
-	private static final Map<String, String> FIELD_MAP = Map.of(
-		"at", "changedAt",
-		"type", "type",
-		"ip", "ip"
-	);
-
 	@Override
-	// public List<EmployeeLogResponse> getLogs(String sortField, String sortDirection, int size) {
-	public Map<String, Object> getLogs(String sortField, String sortDirection, int size) {
-		// 요청 필드를 DB 필드로 변환
-		String mappedField = FIELD_MAP.getOrDefault(sortField, "changed_at");
+	@Transactional
+	public CursorPageResponse<EmployeeLogResponse> getLogs(LocalDateTime cursor, Pageable pageable) {
+		cursor = Optional.ofNullable(cursor)
+			.orElse(LocalDateTime.now());
 
-		// 정렬 방향 설정
-		Sort.Direction direction = sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
-		Sort sort = Sort.by(direction, mappedField);
+		Slice<EmployeeLogs> slice = repository.findAllBy(cursor, pageable);
 
-		// 정렬된 데이터 조회
-		List<EmployeeLogs> employeeLogs = repository.findAll(sort).stream().limit(size).toList();
-
-		// DTO 변환
-		List<EmployeeLogResponse> responses = employeeLogs.stream()
+		List<EmployeeLogResponse> content = slice.getContent()
+			.stream()
 			.map(EmployeeLogMapper.INSTANT::toDto)
-			.collect(Collectors.toList());
+			.toList();
 
-		// content에 데이터 넣기
-		Map<String, Object> result = new HashMap<>();
-		result.put("content", responses);
+		LocalDateTime nextCursor = null;
+		if (!slice.getContent().isEmpty()) {
+			nextCursor = slice.getContent().get(slice.getContent().size() - 1).getChangedAt();
+		}
 
-		return result;
+		Long nextIdAfter = null;
+		if (slice.hasNext()) {
+			nextIdAfter = content.get(content.size() - 1).id();
+		}
+
+		long count = repository.count();
+
+		return new CursorPageResponse<EmployeeLogResponse>(content, nextCursor, nextIdAfter, content.size(),
+			slice.hasNext(), count);
 	}
 
 	@Override

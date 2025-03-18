@@ -1,13 +1,15 @@
 package com.project.hrbank.service;
 
-import java.util.Map;
+import java.time.LocalDateTime;
 
-import com.project.hrbank.dto.requset.EmployeeLogRequest;
+import org.springframework.data.domain.Pageable;
+
+import com.project.hrbank.dto.request.EmployeeLogRequest;
+import com.project.hrbank.dto.response.CursorPageResponse;
 import com.project.hrbank.dto.response.EmployeeLogResponse;
 
 public interface EmployeeLogService {
-	Map<String, Object> getLogs(String sortField, String sortDirection, int size);
-	// List<EmployeeLogResponse> getLogs(String sortField, String sortDirection, int size);
+	CursorPageResponse<EmployeeLogResponse> getLogs(LocalDateTime cursor, Pageable pageable);
 
 	String getLogById(Long id);
 

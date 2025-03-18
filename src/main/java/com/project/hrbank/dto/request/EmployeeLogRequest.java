@@ -1,4 +1,4 @@
-package com.project.hrbank.dto.requset;
+package com.project.hrbank.dto.request;
 
 import java.time.LocalDateTime;
 
