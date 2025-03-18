@@ -16,6 +16,7 @@ import com.project.hrbank.backup.dto.response.BackupDto;
 import com.project.hrbank.backup.dto.response.CursorPageResponseBackupDto;
 import com.project.hrbank.backup.repository.BackupRepository;
 import com.project.hrbank.backup.repository.BackupRepositoryImpl;
+import com.project.hrbank.file.entity.FileEntity;
 import com.project.hrbank.repository.EmployeeLogRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -24,15 +25,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BackupService {
-
+	private static final LocalDateTime POSTGRESQL_MIN_TIMESTAMP = LocalDateTime.of(4713, 11, 24, 0, 0);
 	public static final String SYSTEM_NAME = "SYSTEM";
+
 	private final BackupRepository backupRepository;
 	private final EmployeeLogRepository employeeLogRepository;
 	private final BackupRepositoryImpl backupRepositoryImpl;
 
 	public CursorPageResponseBackupDto findAll(LocalDateTime cursor, Pageable pageable) {
-		cursor = Optional.ofNullable(cursor)
-			.orElse(LocalDateTime.now());
+		cursor = Optional.ofNullable(cursor).orElse(LocalDateTime.now());
 		Slice<Backup> slice = backupRepository.findAllBy(cursor, pageable);
 
 		List<BackupDto> content = getBackupContents(slice);
@@ -64,36 +65,44 @@ public class BackupService {
 
 	@Transactional
 	public BackupDto backup(String clientIpAddr) {
-		LocalDateTime lastEndedAtBackup = getLastEndedAt();
+		LocalDateTime lastEndedAtBackupDateTime = getLastEndedAt();
 
-		Backup backup = null;
-		if (isNotChangedEmployeeInfo(lastEndedAtBackup)) {
-			backup = Backup.ofSkipped(clientIpAddr);
+		Backup backup = Backup.ofInProgress(clientIpAddr);
+		backupRepository.save(backup);
+
+		if (isNotChangedEmployeeInfo(lastEndedAtBackupDateTime)) {
+			backup.updateSkipped();
 			return toDto(backupRepository.save(backup));
 		}
-
-		backup = Backup.ofInProgress(clientIpAddr);
-		Backup progressBackup = backupRepository.save(backup);
 
 		// 4 백업 작업을 수행한다.
-		if (isBackupSuccess()) {
-			backup.update(LocalDateTime.now(), Status.FAILED);
-			return toDto(backupRepository.save(backup));
+		// 4-1 CVS 파일 만들기 -> 파일을 만드는 책임을 분리하자. UserInfoCsvProvider -> createFile() ->
+		// 4-2 생성된 파일에 유저 데이터 적재하기
+		// 4-3 생성된 파일을 멀티파트로 변환하기 -> byte[] 를 Multipart 로 변환해주는 책임을 나누자.
+		// 4-4 파일 데이터베이스에 저장하기 -> FileService 에 변환된 Multipart 파일을 넘겨준다.
+		if (isBackupFail()) {
+			backup.updateFailed();
+			return toDto(backup);
 		}
 
-		backup.update(LocalDateTime.now(), Status.COMPLETED);
+		backup.updateCompleted(createFileTemp());
 		// file repository 를 이용해서 저장된 파일의 메타데이터를 넘겨서 저장한다.
 		return toDto(backup);
+	}
+
+	// 임시로 만들어둠. 이후 지워야함
+	private FileEntity createFileTemp() {
+		return new FileEntity("test", "csv", 10L, "test");
 	}
 
 	private LocalDateTime getLastEndedAt() {
 		return backupRepository.findLastBackup().stream()
 			.findFirst()
 			.map(Backup::getEndedAt)
-			.orElse(LocalDateTime.MIN);
+			.orElse(POSTGRESQL_MIN_TIMESTAMP);
 	}
 
-	private boolean isBackupSuccess() {
+	private boolean isBackupFail() {
 		return false;
 	}
 
