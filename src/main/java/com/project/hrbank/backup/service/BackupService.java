@@ -27,12 +27,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class BackupService {
     private static final LocalDateTime POSTGRESQL_MIN_TIMESTAMP = LocalDateTime.of(4713, 11, 24, 0, 0);
     public static final String SYSTEM_NAME = "SYSTEM";
+    public static final String CSV_CONTENT_TYPE = ".csv";
 
     private final BackupRepository backupRepository;
     private final EmployeeLogRepository employeeLogRepository;
     private final BackupRepositoryImpl backupRepositoryImpl;
     private final FileStorage fileStorage;
-    private final EmployeeRepository employeeRepository;
     private final CsvProvider csvProvider;
 
     public CursorPageResponseBackupDto findAll(LocalDateTime cursor, Pageable pageable) {
@@ -103,8 +103,7 @@ public class BackupService {
     private FileEntity generateBackupFile() {
         String fileName = csvProvider.generateFileName();
         byte[] employeeData = csvProvider.loadEmployeeData();
-        String contentType = ".csv";
-        return fileStorage.saveFile(null, employeeData, fileName, contentType);
+        return fileStorage.saveFile(null, employeeData, fileName, CSV_CONTENT_TYPE);
     }
 
     public BackupDto findLatest() {
