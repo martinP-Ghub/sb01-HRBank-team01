@@ -28,7 +28,7 @@ public interface FileStorage {
 	 * @param fileDto 다운로드할 파일의 메타 데이터
 	 * @return 다운로드 ResponseEntity
 	 */
-	ResponseEntity<?>download(FileDto fileDto);
+	ResponseEntity<?> download(FileDto fileDto);
 
 	/**
 	 * 파일 삭제
