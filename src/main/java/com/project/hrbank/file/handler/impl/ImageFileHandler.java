@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.springframework.core.io.UrlResource;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.project.hrbank.file.entity.FileEntity;
@@ -30,7 +29,7 @@ public class ImageFileHandler implements FileHandler {
 
 	@Override
 	public FileEntity handleDownload(Path filePath, String fileName) throws IOException {
-		if(!Files.exists(filePath) || !Files.isReadable(filePath)) {
+		if (!Files.exists(filePath) || !Files.isReadable(filePath)) {
 			throw new IOException("파일을 읽을 수 없습니다 : " + fileName);
 		}
 		return new FileEntity(null, fileName, "image/jpeg", Files.size(filePath), filePath.toString());

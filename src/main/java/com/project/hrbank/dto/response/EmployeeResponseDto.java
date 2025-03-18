@@ -1,11 +1,15 @@
 package com.project.hrbank.dto.response;
 
-import lombok.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.project.hrbank.entity.EmployeeStatus;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter

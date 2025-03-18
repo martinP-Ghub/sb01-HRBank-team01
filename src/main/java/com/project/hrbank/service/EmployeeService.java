@@ -1,10 +1,10 @@
 package com.project.hrbank.service;
 
+import org.springframework.data.domain.Page;
+
 import com.project.hrbank.dto.request.EmployeeRequestDto;
 import com.project.hrbank.dto.response.EmployeeResponseDto;
 import com.project.hrbank.entity.EmployeeStatus;
-
-import org.springframework.data.domain.Page;
 
 public interface EmployeeService {
 	EmployeeResponseDto registerEmployee(EmployeeRequestDto requestDto);
