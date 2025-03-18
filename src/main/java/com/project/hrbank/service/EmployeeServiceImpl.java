@@ -51,23 +51,17 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	@Override
-	public Page<EmployeeResponseDto> getEmployees(String nameOrEmail, String employeeNumber, String departmentName,
-		String position, String hireDateFrom, String hireDateTo,
-		EmployeeStatus status, Long lastEmployeeId, int size) {
-		Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.ASC, "employeeId"));
+	public Page<EmployeeResponseDto> getEmployees(String nameOrEmail, int page, int size) {
+		Pageable pageable = PageRequest.of(page, size);
 		Page<Employee> employeePage;
 
-		if (lastEmployeeId != null) {
-			employeePage = employeeRepository.findByEmployeeIdGreaterThan(lastEmployeeId, pageable);
+		if (nameOrEmail != null && !nameOrEmail.isEmpty()) {
+			employeePage = employeeRepository.findByNameContainingOrEmailContaining(nameOrEmail, nameOrEmail, pageable);
 		} else {
 			employeePage = employeeRepository.findAll(pageable);
 		}
 
 		return employeePage.map(this::convertToDto);
-	}
-
-	public long countActiveEmployees() {
-		return employeeRepository.countByStatusIn(Arrays.asList(EmployeeStatus.ACTIVE, EmployeeStatus.ON_LEAVE));
 	}
 
 	@Override
@@ -76,36 +70,30 @@ public class EmployeeServiceImpl implements EmployeeService {
 			.map(this::convertToDto)
 			.orElse(null);
 	}
-
 	@Override
-	@Transactional // 트랜잭션 관리 추가
+	public long countActiveEmployees() {
+		return employeeRepository.countByStatus(EmployeeStatus.ACTIVE);
+	}
+
+	@Transactional
+	@Override
 	public EmployeeResponseDto updateEmployee(Long id, EmployeeRequestDto requestDto) {
+		// 기존 직원 정보 가져오기
 		Employee employee = employeeRepository.findById(id).get();
 
-		// 이메일 중복 검사
-		if (requestDto.getEmail() != null && !employee.getEmail().equals(requestDto.getEmail())) {
-			if (employeeRepository.existsByEmailAndEmployeeIdNot(requestDto.getEmail(), id)) {
-				throw new IllegalArgumentException("중복된 이메일입니다.");
-			}
-			employee.setEmail(requestDto.getEmail());
-		}
+		// 클라이언트가 제공한 값으로 업데이트
+		employee.setName(requestDto.getName());
+		employee.setEmail(requestDto.getEmail());
+		employee.setDepartmentId(requestDto.getDepartmentId());
+		employee.setPosition(requestDto.getPosition());
+		employee.setHireDate(requestDto.getHireDate());
+		employee.setStatus(requestDto.getStatus());
 
-		// 필드 업데이트 (null 체크 포함)
-		if (requestDto.getName() != null) {
-			employee.setName(requestDto.getName());
-		}
-		if (requestDto.getDepartmentId() != null) {
-			employee.setDepartmentId(requestDto.getDepartmentId());
-		}
-		if (requestDto.getPosition() != null) {
-			employee.setPosition(requestDto.getPosition());
-		}
-		if (requestDto.getHireDate() != null) {
-			employee.setHireDate(requestDto.getHireDate());
-		}
+		// 변경된 데이터를 저장
+		Employee updatedEmployee = employeeRepository.save(employee);
 
-		// 변경된 데이터를 저장 (save 호출은 필요할 수 있음)
-		return convertToDto(employee); // 더티 체킹으로 자동 반영됨
+		// DTO로 변환하여 반환
+		return convertToDto(updatedEmployee);
 	}
 
 	@Override

@@ -14,8 +14,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
 	boolean existsByEmailAndEmployeeIdNot(String email, Long employeeId);
 
-	Page<Employee> findByEmployeeIdGreaterThan(Long employeeId, Pageable pageable);
+	long countByStatus(EmployeeStatus status);
 
-	long countByStatusIn(List<EmployeeStatus> statuses);
+	Page<Employee> findByNameContainingOrEmailContaining(String name, String email, Pageable pageable);
 }
-

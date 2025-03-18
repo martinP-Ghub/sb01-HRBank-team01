@@ -4,6 +4,8 @@ import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.project.hrbank.entity.EmployeeStatus;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -35,6 +37,6 @@ public class EmployeeRequestDto {
 	@NotNull(message = "입사일을 입력해주세요.")
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate hireDate;
-
+	private EmployeeStatus status;
 	private Long profileImageId;
 }
