@@ -85,16 +85,20 @@ public class LocalFileStorage implements FileStorage {
 	}
 
 	@Override
-	public ResponseEntity<?> download(FileDto fileDto) {
-		InputStream findFileStream = get(fileDto.id());
+	public InputStream getFileStream(Long id) {
+		FileEntity fileEntity = fileRepository.findById(id)
+			.orElseThrow(() -> new RuntimeException("파일을 찾을 수 없습니다: " + id));
 
-		InputStreamResource fileResource = new InputStreamResource(findFileStream);
+		Path filePath = Paths.get(fileEntity.getFilePath());
+		if (!Files.exists(filePath)) {
+			throw new RuntimeException("파일이 존재하지 않습니다: " + id);
+		}
 
-		return ResponseEntity.ok()
-			.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileDto.fileName() + "\"")
-			.contentLength(fileDto.size())
-			.contentType(MediaType.parseMediaType(fileDto.contentType()))
-			.body(fileResource);
+		try {
+			return Files.newInputStream(filePath);
+		} catch (IOException e) {
+			throw new RuntimeException("파일 스트림 생성 실패", e);
+		}
 	}
 
 
