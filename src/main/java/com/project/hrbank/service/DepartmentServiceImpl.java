@@ -10,7 +10,9 @@ import com.project.hrbank.entity.Department;
 import com.project.hrbank.repository.DepartmentRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DepartmentServiceImpl implements DepartmentService {
@@ -57,10 +59,31 @@ public class DepartmentServiceImpl implements DepartmentService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Page<DepartmentDto> getAllDepartments(Pageable pageable) {
-		return departmentRepository.findAll(pageable)
-			.map(department -> new DepartmentDto(department.getId(), department.getName(), department.getDescription(),
-				department.getEstablishedDate(), getEmployeeCount(department.getId()), department.getCreatedAt()));
+	public Page<DepartmentDto> getAllDepartments(Pageable pageable, String search) {
+		if (search != null && !search.isBlank()) {
+			return departmentRepository
+				.searchDepartments(search, pageable)
+				.map(department -> new DepartmentDto(
+					department.getId(),
+					department.getName(),
+					department.getDescription(),
+					department.getEstablishedDate(),
+					getEmployeeCount(department.getId()),
+					department.getCreatedAt()
+				));
+		}
+
+		log.info("Returning all departments");
+		return departmentRepository
+			.findAll(pageable)
+			.map(department -> new DepartmentDto(
+				department.getId(),
+				department.getName(),
+				department.getDescription(),
+				department.getEstablishedDate(),
+				getEmployeeCount(department.getId()),
+				department.getCreatedAt()
+			));
 	}
 
 	@Override

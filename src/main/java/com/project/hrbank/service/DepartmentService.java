@@ -10,7 +10,7 @@ public interface DepartmentService {
 
 	DepartmentDto getDepartmentById(Long id);
 
-	Page<DepartmentDto> getAllDepartments(Pageable pageable);
+	Page<DepartmentDto> getAllDepartments(Pageable pageable, String search);
 
 	DepartmentDto updateDepartment(Long id, DepartmentDto dto);
 

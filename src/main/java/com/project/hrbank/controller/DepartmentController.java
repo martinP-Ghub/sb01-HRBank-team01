@@ -1,7 +1,13 @@
 package com.project.hrbank.controller;
 
+import java.util.Collections;
+
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,13 +17,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.hrbank.dto.DepartmentDto;
 import com.project.hrbank.service.DepartmentService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/departments")
 @RequiredArgsConstructor
@@ -42,8 +51,28 @@ public class DepartmentController {
 	}
 
 	@GetMapping
-	public ResponseEntity<Page<DepartmentDto>> getAllDepartments(Pageable pageable) {
-		Page<DepartmentDto> departments = departmentService.getAllDepartments(pageable);
+	public ResponseEntity<Page<DepartmentDto>> getAllDepartments(
+		@RequestParam(required = false) String nameOrDescription,
+		@RequestParam(required = false) String sortField,
+		@RequestParam(defaultValue = "asc") String sortDirection,
+		@PageableDefault(size = 30, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
+
+		String searchQuery = nameOrDescription != null && !nameOrDescription.trim().isEmpty()
+			? nameOrDescription.trim()
+			: null;
+
+		if (sortField != null) {
+			Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
+			pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+		}
+
+		Page<DepartmentDto> departments = departmentService.getAllDepartments(pageable, searchQuery);
+
+		if (departments.isEmpty()) {
+			log.info("No departments found for search: {}", searchQuery);
+			return ResponseEntity.ok(new PageImpl<>(Collections.emptyList(), pageable, 0));
+		}
+
 		return ResponseEntity.ok(departments);
 	}
 
