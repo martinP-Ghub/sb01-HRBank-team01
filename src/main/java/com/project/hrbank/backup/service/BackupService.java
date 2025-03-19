@@ -1,7 +1,5 @@
 package com.project.hrbank.backup.service;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -16,13 +14,10 @@ import com.project.hrbank.backup.domain.Backup;
 import com.project.hrbank.backup.domain.Status;
 import com.project.hrbank.backup.dto.response.BackupDto;
 import com.project.hrbank.backup.dto.response.CursorPageResponseBackupDto;
-import com.project.hrbank.backup.provider.CsvProvider;
+import com.project.hrbank.backup.provider.EmlpoyeesLogCsvFileProvider;
 import com.project.hrbank.backup.repository.BackupRepository;
 import com.project.hrbank.backup.repository.BackupRepositoryImpl;
 import com.project.hrbank.file.entity.FileEntity;
-import com.project.hrbank.file.repository.FileRepository;
-import com.project.hrbank.file.service.FileService;
-import com.project.hrbank.file.storage.FileStorage;
 import com.project.hrbank.repository.EmployeeLogRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -32,18 +27,12 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class BackupService {
 	private static final LocalDateTime POSTGRESQL_MIN_TIMESTAMP = LocalDateTime.of(4713, 11, 24, 0, 0);
-	public static final String SYSTEM_NAME = "SYSTEM";
-	public static final String CSV_CONTENT_TYPE = ".csv";
+	private static final String SYSTEM_NAME = "SYSTEM";
 
 	private final BackupRepository backupRepository;
 	private final EmployeeLogRepository employeeLogRepository;
-	private final FileService fileService;
-
-	private final FileRepository fileRepository;
-	private final FileStorage fileStorage;
-
 	private final BackupRepositoryImpl backupRepositoryImpl;
-	private final CsvProvider csvProvider;
+	private final EmlpoyeesLogCsvFileProvider csvProvider;
 
 	public CursorPageResponseBackupDto findAll(LocalDateTime cursor, Pageable pageable) {
 		cursor = Optional.ofNullable(cursor).orElse(LocalDateTime.now());
@@ -87,21 +76,7 @@ public class BackupService {
 			return toDto(backupRepository.save(backup));
 		}
 
-		// 백업 파일 생성
-		// 1 fileId = backupId(다음으로 생성될 ID 디비에서 가져오기), fileName, createAt (파일을 생성 필요 데이터)
-
-		// 2 생성된 파일에 Employees 정보를 적재
-
-		// 3. 성공
-
-		// 4. 실패
-
-		// 마지막 엔티티 저장 fileId, fileName, fileContent, fileSize, filePath (엔티티 저장 필요 데이터)
-		// -> FileEntity 생성 한 후 저장했던 Backup 엔티티에 업데이트 해주면 될듯
-		//    backup 엔티티 처리 상태 업데이트
-
-		// 로그 파일에 데이터 쓰기
-		// backup 엔티티 처리 상태 업데이트
+		generateBackupFile(backup);
 
 		return toDto(backup);
 	}
@@ -123,13 +98,13 @@ public class BackupService {
 		return !employeeLogRepository.existsByChangedAtAfter(endedAt);
 	}
 
-	private FileEntity generateBackupFile() {
-		String fileName = csvProvider.generateFileName();
-		byte[] employeeData = csvProvider.loadEmployeeData();
-		Path path = Paths.get("system.user", "files");
-		Long length = (long)employeeData.length;
-		FileEntity fileEntity = new FileEntity(null, fileName, "csv", length, path.toString());
-		return fileStorage.saveFile(fileEntity.getId(), employeeData, fileName, CSV_CONTENT_TYPE);
+	private void generateBackupFile(Backup backup) {
+		try {
+			FileEntity fileEntity = csvProvider.saveEmployeeLogFile(backup.getId());
+			backup.updateCompleted(fileEntity);
+		} catch (RuntimeException exception) {
+			backup.updateFailed();
+		}
 	}
 
 	public BackupDto findLatest() {

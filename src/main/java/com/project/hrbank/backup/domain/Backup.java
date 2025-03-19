@@ -3,15 +3,12 @@ package com.project.hrbank.backup.domain;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
+import com.project.hrbank.entity.base.BaseTimeEntity;
 import com.project.hrbank.file.entity.FileEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
@@ -29,8 +26,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "backups")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
-public class Backup {
+public class Backup extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,11 +46,6 @@ public class Backup {
 	@Column(name = "status", nullable = false)
 	private Status status;
 
-	@CreatedDate
-	@Column(name = "created_at", nullable = false, updatable = false)
-	private LocalDateTime createdAt;
-
-	// file_id 연관관계 맺기 1..0 : 1 여기가 주인임!
 	@OneToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
 	@JoinColumn(name = "file_id")
 	FileEntity file;
