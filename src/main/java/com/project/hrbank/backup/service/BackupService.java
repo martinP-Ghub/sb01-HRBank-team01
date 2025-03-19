@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,7 @@ import com.project.hrbank.backup.domain.Backup;
 import com.project.hrbank.backup.domain.Status;
 import com.project.hrbank.backup.dto.response.BackupDto;
 import com.project.hrbank.backup.dto.response.CursorPageResponseBackupDto;
-import com.project.hrbank.backup.provider.EmlpoyeesLogCsvFileProvider;
+import com.project.hrbank.backup.provider.EmployeesLogCsvFileProvider;
 import com.project.hrbank.backup.repository.BackupRepository;
 import com.project.hrbank.backup.repository.BackupRepositoryImpl;
 import com.project.hrbank.file.entity.FileEntity;
@@ -32,26 +33,30 @@ public class BackupService {
 	private final BackupRepository backupRepository;
 	private final EmployeeLogRepository employeeLogRepository;
 	private final BackupRepositoryImpl backupRepositoryImpl;
-	private final EmlpoyeesLogCsvFileProvider csvProvider;
+	private final EmployeesLogCsvFileProvider csvProvider;
 
-	public CursorPageResponseBackupDto findAll(LocalDateTime cursor, Pageable pageable) {
+	public CursorPageResponseBackupDto findAll(
+		LocalDateTime cursor,
+		Status status,
+		Pageable pageable
+	) {
 		cursor = Optional.ofNullable(cursor).orElse(LocalDateTime.now());
-		Slice<Backup> slice = backupRepository.findAllBy(cursor, pageable);
 
-		List<BackupDto> content = getBackupContents(slice);
+		Page<Backup> page = backupRepository.findAllBy(cursor, status, pageable);
+
+		List<BackupDto> content = getBackupContents(page);
 
 		LocalDateTime nextCursor = null;
-		if (slice.hasContent()) {
-			nextCursor = slice.getContent().get(slice.getContent().size() - 1).getCreatedAt();
+		if (page.hasContent()) {
+			nextCursor = content.get(content.size() - 1).startedAt();
 		}
 
 		Long nextIdAfter = null;
-		if (slice.hasNext()) {
+		if (page.hasNext() && page.hasContent()) {
 			nextIdAfter = content.get(content.size() - 1).id();
 		}
 
-		long count = backupRepository.count();
-		return new CursorPageResponseBackupDto(content, nextCursor, nextIdAfter, content.size(), slice.hasNext(), count);
+		return new CursorPageResponseBackupDto(content, nextCursor, nextIdAfter, content.size(), page.hasNext(), page.getTotalElements());
 	}
 
 	private List<BackupDto> getBackupContents(Slice<Backup> slice) {
@@ -130,25 +135,22 @@ public class BackupService {
 		LocalDateTime endDate,
 		Pageable pageable
 	) {
-		cursor = Optional.ofNullable(cursor)
-			.orElse(LocalDateTime.now());
-		Slice<Backup> slice = backupRepositoryImpl.findWithSearchCondition(cursor, status, startDate, endDate,
-			pageable);
+		cursor = Optional.ofNullable(cursor).orElse(LocalDateTime.now());
+		Page<Backup> page = backupRepositoryImpl.findWithSearchCondition(cursor, status, startDate, endDate, pageable);
 
-		List<BackupDto> content = getBackupContents(slice);
+		List<BackupDto> content = getBackupContents(page);
 
 		LocalDateTime nextCursor = null;
-		if (!slice.getContent().isEmpty()) {
-			nextCursor = slice.getContent().get(slice.getContent().size() - 1).getCreatedAt();
+		if (page.hasContent()) {
+			nextCursor = content.get(content.size() - 1).startedAt();
 		}
 
+		// 다음 페이지 존재 여부 확인
 		Long nextIdAfter = null;
-		if (slice.hasNext()) {
+		if (page.hasNext() && page.hasContent()) {
 			nextIdAfter = content.get(content.size() - 1).id();
 		}
 
-		long count = backupRepository.countBackups(status);
-		return new CursorPageResponseBackupDto(content, nextCursor, nextIdAfter, content.size(), slice.hasNext(),
-			count);
+		return new CursorPageResponseBackupDto(content, nextCursor, nextIdAfter, content.size(), page.hasNext(), page.getTotalElements());
 	}
 }

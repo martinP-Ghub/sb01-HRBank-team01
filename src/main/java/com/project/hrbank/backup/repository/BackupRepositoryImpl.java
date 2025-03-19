@@ -4,9 +4,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
 import com.project.hrbank.backup.domain.Backup;
@@ -22,7 +22,7 @@ public class BackupRepositoryImpl {
 
 	private final EntityManager entityManager;
 
-	public Slice<Backup> findWithSearchCondition(LocalDateTime cursor, Status status, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
+	public Page<Backup> findWithSearchCondition(LocalDateTime cursor, Status status, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
 		String jpql = "SELECT b FROM Backup b";
 		String whereSql = " WHERE ";
 		List<String> whereCondition = new ArrayList<>();
@@ -69,18 +69,53 @@ public class BackupRepositoryImpl {
 		// 페이징 적용
 		List<Backup> backups = query
 			.setFirstResult((int)pageable.getOffset())
-			.setMaxResults(pageable.getPageSize() + 1)
+			.setMaxResults(pageable.getPageSize())
 			.getResultList();
 
-		return toSlice(pageable, backups);
+		// 전체 개수 조회
+		long totalCount = getTotalCount(cursor, status, startDate, endDate);
+
+		return new PageImpl<>(backups, pageable, totalCount);
 	}
 
-	private Slice<Backup> toSlice(Pageable pageable, List<Backup> backups) {
-		boolean hasNext = backups.size() > pageable.getPageSize();
-		if (hasNext) {
-			backups.remove(pageable.getPageSize());
+	private long getTotalCount(LocalDateTime cursor, Status status, LocalDateTime startDate, LocalDateTime endDate) {
+		String countJpql = "SELECT COUNT(b) FROM Backup b";
+		String whereSql = " WHERE ";
+		List<String> whereCondition = new ArrayList<>();
+
+		if (cursor != null) {
+			whereCondition.add("b.createdAt < :cursor");
 		}
-		return new SliceImpl<>(backups, pageable, hasNext);
+		if (status != null) {
+			whereCondition.add("b.status = :status");
+		}
+		if (startDate != null) {
+			whereCondition.add("b.startedAt >= :startDate");
+		}
+		if (endDate != null) {
+			whereCondition.add("b.endedAt <= :endDate");
+		}
+
+		if (!whereCondition.isEmpty()) {
+			countJpql += whereSql + String.join(" AND ", whereCondition);
+		}
+
+		TypedQuery<Long> countQuery = entityManager.createQuery(countJpql, Long.class);
+
+		if (cursor != null) {
+			countQuery.setParameter("cursor", cursor);
+		}
+		if (status != null) {
+			countQuery.setParameter("status", status);
+		}
+		if (startDate != null) {
+			countQuery.setParameter("startDate", startDate);
+		}
+		if (endDate != null) {
+			countQuery.setParameter("endDate", endDate);
+		}
+
+		return countQuery.getSingleResult();
 	}
 }
 

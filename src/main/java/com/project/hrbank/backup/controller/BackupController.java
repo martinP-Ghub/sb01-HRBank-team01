@@ -30,6 +30,7 @@ public class BackupController {
 	@GetMapping
 	public ResponseEntity<CursorPageResponseBackupDto> findAll(
 		@RequestParam(required = false) LocalDateTime cursor,
+		@RequestParam(required = false) Status status,
 		@PageableDefault(
 			size = 30,
 			page = 0,
@@ -37,7 +38,7 @@ public class BackupController {
 			direction = Sort.Direction.DESC
 		) Pageable pageable
 	) {
-		CursorPageResponseBackupDto backupDto = backupService.findAll(cursor, pageable);
+		CursorPageResponseBackupDto backupDto = backupService.findAll(cursor, status, pageable);
 		return ResponseEntity.ok().body(backupDto);
 	}
 
@@ -58,20 +59,20 @@ public class BackupController {
 	/**
 	 *  동적 쿼리 테스트
 	 */
-	@GetMapping("/all")
-	public ResponseEntity<CursorPageResponseBackupDto> findAll(
-		@RequestParam(required = false) LocalDateTime cursor,
-		@RequestParam(required = false) Status status,
-		@RequestParam(required = false) LocalDateTime startDate,
-		@RequestParam(required = false) LocalDateTime endDate,
-		@PageableDefault(
-			size = 30,
-			page = 0,
-			sort = "startedAt",
-			direction = Sort.Direction.DESC
-		) Pageable pageable
-	) {
-		CursorPageResponseBackupDto backupDto = backupService.findWithSearchCondition(cursor, status, startDate, endDate, pageable);
-		return ResponseEntity.ok().body(backupDto);
-	}
+	// @GetMapping
+	// public ResponseEntity<CursorPageResponseBackupDto> findAll(
+	// 	@RequestParam(required = false) LocalDateTime cursor,
+	// 	@RequestParam(required = false) Status status,
+	// 	@RequestParam(required = false) LocalDateTime startDate,
+	// 	@RequestParam(required = false) LocalDateTime endDate,
+	// 	@PageableDefault(
+	// 		size = 30,
+	// 		page = 0,
+	// 		sort = "startedAt",
+	// 		direction = Sort.Direction.DESC
+	// 	) Pageable pageable
+	// ) {
+	// 	CursorPageResponseBackupDto backupDto = backupService.findWithSearchCondition(cursor, status, startDate, endDate, pageable);
+	// 	return ResponseEntity.ok().body(backupDto);
+	// }
 }
