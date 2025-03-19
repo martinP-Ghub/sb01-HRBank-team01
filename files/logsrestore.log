@@ -1,0 +1,129 @@
+1df976500 : Brain operations will run at their default (UTILITY) QOS
+16fdbf000 : Running event handler at QoS 0x11
+16fed7000 : Running event handler at QoS 0x11
+16fed7000 : setSystemTargetUUID will use / as the target
+16fed7000 : Found update container: LPAPFSContainer: AppleAPFSMedia, UUID: 335AA043-0A37-4DAA-A8CE-E65768E86D24
+16fed7000 : Found update volume: LPAPFSVolume: Update, Mount: /System/Volumes/Update
+16fed7000 : Will open restore file at: /System/Volumes/Update/restore.log
+1df976500 : Brain operations will run at their default (UTILITY) QOS
+16f843000 : Running event handler at QoS 0x11
+16f7b7000 : Running event handler at QoS 0x11
+16f7b7000 : setSystemTargetUUID will use / as the target
+16f7b7000 : Found update container: LPAPFSContainer: AppleAPFSMedia, UUID: 335AA043-0A37-4DAA-A8CE-E65768E86D24
+16f7b7000 : Found update volume: LPAPFSVolume: Update, Mount: /System/Volumes/Update
+16f7b7000 : Will open restore file at: /System/Volumes/Update/restore.log
+1df976500 : Brain operations will run at their default (UTILITY) QOS
+16fae3000 : Running event handler at QoS 0x11
+16fbfb000 : Running event handler at QoS 0x11
+16fbfb000 : setSystemTargetUUID will use / as the target
+16fbfb000 : Found update container: LPAPFSContainer: AppleAPFSMedia, UUID: 335AA043-0A37-4DAA-A8CE-E65768E86D24
+16fbfb000 : Found update volume: LPAPFSVolume: Update, Mount: /System/Volumes/Update
+16fbfb000 : Will open restore file at: /System/Volumes/Update/restore.log
+1df976500 : Brain operations will run at their default (UTILITY) QOS
+16ddeb000 : Running event handler at QoS 0x11
+16dd5f000 : Running event handler at QoS 0x11
+16dd5f000 : setSystemTargetUUID will use / as the target
+16dd5f000 : Found update container: LPAPFSContainer: AppleAPFSMedia, UUID: 335AA043-0A37-4DAA-A8CE-E65768E86D24
+16dd5f000 : Found update volume: LPAPFSVolume: Update, Mount: /System/Volumes/Update
+16dd5f000 : Will open restore file at: /System/Volumes/Update/restore.log
+1df976500 : Brain operations will run at their default (UTILITY) QOS
+16d663000 : Running event handler at QoS 0x11
+16d6ef000 : Running event handler at QoS 0x11
+16d6ef000 : setSystemTargetUUID will use / as the target
+16d6ef000 : Found update container: LPAPFSContainer: AppleAPFSMedia, UUID: 335AA043-0A37-4DAA-A8CE-E65768E86D24
+16d6ef000 : Found update volume: LPAPFSVolume: Update, Mount: /System/Volumes/Update
+16d6ef000 : Will open restore file at: /System/Volumes/Update/restore.log
+1df976500 : Brain operations will run at their default (UTILITY) QOS
+16bad7000 : Running event handler at QoS 0x11
+16ba4b000 : Running event handler at QoS 0x11
+16ba4b000 : setSystemTargetUUID will use / as the target
+16ba4b000 : Found update container: LPAPFSContainer: AppleAPFSMedia, UUID: 335AA043-0A37-4DAA-A8CE-E65768E86D24
+16ba4b000 : Found update volume: LPAPFSVolume: Update, Mount: /System/Volumes/Update
+16ba4b000 : Will open restore file at: /System/Volumes/Update/restore.log
+1df976500 : Brain operations will run at their default (UTILITY) QOS
+16d87f000 : Running event handler at QoS 0x11
+16d90b000 : Running event handler at QoS 0x11
+16d90b000 : setSystemTargetUUID will use / as the target
+16d90b000 : Found update container: LPAPFSContainer: AppleAPFSMedia, UUID: 335AA043-0A37-4DAA-A8CE-E65768E86D24
+16d90b000 : Found update volume: LPAPFSVolume: Update, Mount: /System/Volumes/Update
+16d90b000 : Will open restore file at: /System/Volumes/Update/restore.log
+1df976500 : Brain operations will run at their default (UTILITY) QOS
+16f67b000 : Running event handler at QoS 0x11
+16f67b000 : Running event handler at QoS 0x11
+16f67b000 : setSystemTargetUUID will use / as the target
+16f67b000 : Found update container: LPAPFSContainer: AppleAPFSMedia, UUID: 335AA043-0A37-4DAA-A8CE-E65768E86D24
+16f67b000 : Found update volume: LPAPFSVolume: Update, Mount: /System/Volumes/Update
+16f67b000 : Will open restore file at: /System/Volumes/Update/restore.log
+1df976500 : Brain operations will run at their default (UTILITY) QOS
+16b5fb000 : Running event handler at QoS 0x11
+16b5fb000 : Running event handler at QoS 0x11
+16b5fb000 : setSystemTargetUUID will use / as the target
+16b5fb000 : Found update container: LPAPFSContainer: AppleAPFSMedia, UUID: 335AA043-0A37-4DAA-A8CE-E65768E86D24
+16b5fb000 : Found update volume: LPAPFSVolume: Update, Mount: /System/Volumes/Update
+16b5fb000 : Will open restore file at: /System/Volumes/Update/restore.log
+1f4f16500 : Brain operations will run at their default (UTILITY) QOS
+16d3ef000 : Running event handler at QoS 0x11
+16d3ef000 : Running event handler at QoS 0x11
+16d3ef000 : Preparing Update volume
+16d3ef000 : setSystemTargetUUID will use / as the target
+16d3ef000 : Found update container: LPAPFSContainer: AppleAPFSMedia, UUID: 335AA043-0A37-4DAA-A8CE-E65768E86D24
+16d3ef000 : Found update volume: LPAPFSVolume: Update, Mount: /System/Volumes/Update
+16d3ef000 : Will open restore file at: /System/Volumes/Update/restore.log
+1dd306500 : Brain operations will run at their default (UTILITY) QOS
+16f713000 : Running event handler at QoS 0x11
+16f8b7000 : Running event handler at QoS 0x11
+16f8b7000 : Preparing Update volume
+16f8b7000 : setSystemTargetUUID will use / as the target
+16f8b7000 : Found update container: LPAPFSContainer: AppleAPFSMedia, UUID: 335AA043-0A37-4DAA-A8CE-E65768E86D24
+16f8b7000 : Found update volume: LPAPFSVolume: Update, Mount: /System/Volumes/Update
+16f8b7000 : Will open restore file at: /System/Volumes/Update/restore.log
+1dd306500 : Brain operations will run at their default (UTILITY) QOS
+16b50f000 : Running event handler at QoS 0x11
+16b627000 : Running event handler at QoS 0x11
+16b627000 : setSystemTargetUUID will use / as the target
+16b627000 : Found update container: LPAPFSContainer: AppleAPFSMedia, UUID: 335AA043-0A37-4DAA-A8CE-E65768E86D24
+16b627000 : Found update volume: LPAPFSVolume: Update, Mount: /System/Volumes/Update
+16b627000 : Will open restore file at: /System/Volumes/Update/restore.log
+1dd306500 : Brain operations will run at their default (UTILITY) QOS
+16bf33000 : Running event handler at QoS 0x11
+16be1b000 : Running event handler at QoS 0x11
+16be1b000 : setSystemTargetUUID will use / as the target
+16be1b000 : Found update container: LPAPFSContainer: AppleAPFSMedia, UUID: 335AA043-0A37-4DAA-A8CE-E65768E86D24
+16be1b000 : Found update volume: LPAPFSVolume: Update, Mount: /System/Volumes/Update
+16be1b000 : Will open restore file at: /System/Volumes/Update/restore.log
+1dd306500 : Brain operations will run at their default (UTILITY) QOS
+16d21b000 : Running event handler at QoS 0x11
+16d103000 : Running event handler at QoS 0x11
+16d103000 : setSystemTargetUUID will use / as the target
+16d103000 : Found update container: LPAPFSContainer: AppleAPFSMedia, UUID: 335AA043-0A37-4DAA-A8CE-E65768E86D24
+16d103000 : Found update volume: LPAPFSVolume: Update, Mount: /System/Volumes/Update
+16d103000 : Will open restore file at: /System/Volumes/Update/restore.log
+1eac6e500 : Brain operations will run at their default (UTILITY) QOS
+16f7bf000 : Running event handler at QoS 0x11
+16f7bf000 : Running event handler at QoS 0x11
+16f7bf000 : setSystemTargetUUID will use / as the target
+16f7bf000 : Found update container: LPAPFSContainer: AppleAPFSMedia, UUID: 335AA043-0A37-4DAA-A8CE-E65768E86D24
+16f7bf000 : Found update volume: LPAPFSVolume: Update, Mount: /System/Volumes/Update
+16f7bf000 : Will open restore file at: /System/Volumes/Update/restore.log
+1eac6e500 : Brain operations will run at their default (UTILITY) QOS
+16d57b000 : Running event handler at QoS 0x11
+16d463000 : Running event handler at QoS 0x11
+16d463000 : setSystemTargetUUID will use / as the target
+16d463000 : Found update container: LPAPFSContainer: AppleAPFSMedia, UUID: 335AA043-0A37-4DAA-A8CE-E65768E86D24
+16d463000 : Found update volume: LPAPFSVolume: Update, Mount: /System/Volumes/Update
+16d463000 : Will open restore file at: /System/Volumes/Update/restore.log
+20107a500 : Brain operations will run at their default (UTILITY) QOS
+16f1ab000 : Running event handler at QoS 0x11
+16f2c3000 : Running event handler at QoS 0x11
+16f2c3000 : setSystemTargetUUID will use / as the target
+16f2c3000 : Found update container: LPAPFSContainer: AppleAPFSMedia, UUID: 335AA043-0A37-4DAA-A8CE-E65768E86D24
+16f2c3000 : Found update volume: LPAPFSVolume: Update, Mount: /System/Volumes/Update
+16f2c3000 : Will open restore file at: /System/Volumes/Update/restore.log
+209a4a500 : Brain operations will run at their default (UTILITY) QOS
+16fd33000 : Running event handler at QoS 0x11
+16fdbf000 : Running event handler at QoS 0x11
+16fdbf000 : Preparing Update volume
+16fdbf000 : setSystemTargetUUID will use / as the target
+16fdbf000 : Found update container: LPAPFSContainer: AppleAPFSMedia, UUID: 335AA043-0A37-4DAA-A8CE-E65768E86D24
+16fdbf000 : Found update volume: LPAPFSVolume: Update, Mount: /System/Volumes/Update
+16fdbf000 : Will open restore file at: /System/Volumes/Update/restore.log

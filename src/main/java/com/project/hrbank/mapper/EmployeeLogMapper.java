@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-import com.project.hrbank.dto.requset.EmployeeLogRequest;
+import com.project.hrbank.dto.request.EmployeeLogRequest;
 import com.project.hrbank.dto.response.EmployeeLogResponse;
 import com.project.hrbank.entity.EmployeeLogs;
 

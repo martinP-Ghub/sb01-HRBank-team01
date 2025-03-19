@@ -1,8 +1,11 @@
 package com.project.hrbank.file.handler;
 
 import java.io.IOException;
-import org.springframework.core.io.Resource;
+import java.nio.file.Path;
+
 import org.springframework.web.multipart.MultipartFile;
+
+import com.project.hrbank.file.entity.FileEntity;
 
 public interface FileHandler {
 
@@ -14,19 +17,27 @@ public interface FileHandler {
 	boolean supports(String extension);
 
 	/**
-	 *
-	 * @param file 업로드할 파일
+	 * 파일 처리 후 가공된 파일 데이터 반환
+	 * @param file  업로드 할 파일
+	 * @return 처리된 파일의 바이트 배열
 	 * @throws IOException 파일 처리 중 오류 발생
 	 */
-	void processFile(MultipartFile file) throws IOException;
+	byte[] processMultipartFile(MultipartFile file) throws IOException;
 
 	/**
 	 *
-	 * @param fileResource 다운로드할 파일 리소스
+	 * @param fileData 업로드 할 파일 데이터
+	 * @return 처리된 파일의 바이트 배열
+	 * @throws IOException 파일 처리 중 오류 발생
+	 */
+	byte[] processFileData(String fileName, byte[] fileData) throws IOException;
+
+	/**
+	 * @param filePath 파일 경로
 	 * @param fileName 파일명
 	 * @return 파일 다운로드 응답 객체
 	 * @throws IOException 파일 처리 중 오류 발생 가능
 	 */
-	Resource handleDownload(Resource fileResource, String fileName) throws IOException;
+	FileEntity handleDownload(Path filePath, String fileName) throws IOException;
 
 }
