@@ -1,6 +1,7 @@
 package com.project.hrbank.backup.domain;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -56,7 +57,7 @@ public class Backup {
 	// file_id 연관관계 맺기 1..0 : 1 여기가 주인임!
 	@OneToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
 	@JoinColumn(name = "file_id")
-	FileEntity files;
+	FileEntity file;
 
 	public Backup(String worker, Status status, LocalDateTime startedAt, LocalDateTime endedAt) {
 		this.worker = worker;
@@ -88,7 +89,13 @@ public class Backup {
 	public void updateCompleted(FileEntity file) {
 		this.endedAt = LocalDateTime.now();
 		this.status = Status.COMPLETED;
-		this.files = file;
+		this.file = file;
+	}
+
+	public Long getFileId() {
+		return Optional.ofNullable(this.file)
+			.map(FileEntity::getId)
+			.orElse(null);
 	}
 
 }
