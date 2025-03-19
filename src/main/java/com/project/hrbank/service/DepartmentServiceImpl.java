@@ -1,8 +1,9 @@
 package com.project.hrbank.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,9 +44,22 @@ public class DepartmentServiceImpl implements DepartmentService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<DepartmentDto> getAllDepartments() {
-		return departmentRepository.findAll()
-			.stream()
+	public Optional<DepartmentDto> getDepartmentById(Long id) {
+		return departmentRepository.findById(id)
+			.map(department -> new DepartmentDto(
+				department.getId(),
+				department.getName(),
+				department.getDescription(),
+				department.getEstablishedDate(),
+				getEmployeeCount(department.getId()), // Keep this if employeeCount is needed
+				department.getCreatedAt()
+			));
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Page<DepartmentDto> getAllDepartments(Pageable pageable) {
+		return departmentRepository.findAll(pageable)
 			.map(department -> new DepartmentDto(
 				department.getId(),
 				department.getName(),
@@ -53,8 +67,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 				department.getEstablishedDate(),
 				getEmployeeCount(department.getId()),
 				department.getCreatedAt()
-			))
-			.collect(Collectors.toList());
+			));
 	}
 
 	@Override
