@@ -21,6 +21,7 @@ import com.project.hrbank.backup.repository.BackupRepository;
 import com.project.hrbank.backup.repository.BackupRepositoryImpl;
 import com.project.hrbank.file.entity.FileEntity;
 import com.project.hrbank.file.repository.FileRepository;
+import com.project.hrbank.file.service.FileService;
 import com.project.hrbank.file.storage.FileStorage;
 import com.project.hrbank.repository.EmployeeLogRepository;
 
@@ -36,6 +37,8 @@ public class BackupService {
 
 	private final BackupRepository backupRepository;
 	private final EmployeeLogRepository employeeLogRepository;
+	private final FileService fileService;
+
 	private final FileRepository fileRepository;
 	private final FileStorage fileStorage;
 
@@ -49,7 +52,7 @@ public class BackupService {
 		List<BackupDto> content = getBackupContents(slice);
 
 		LocalDateTime nextCursor = null;
-		if (!slice.getContent().isEmpty()) {
+		if (slice.hasContent()) {
 			nextCursor = slice.getContent().get(slice.getContent().size() - 1).getCreatedAt();
 		}
 
@@ -95,14 +98,10 @@ public class BackupService {
 
 		// 마지막 엔티티 저장 fileId, fileName, fileContent, fileSize, filePath (엔티티 저장 필요 데이터)
 		// -> FileEntity 생성 한 후 저장했던 Backup 엔티티에 업데이트 해주면 될듯
+		//    backup 엔티티 처리 상태 업데이트
 
-		try {
-			FileEntity generateBackupFile = generateBackupFile();
-			backup.updateCompleted(generateBackupFile);
-		} catch (RuntimeException exception) {
-			backup.updateFailed();
-			// 로그 파일에 데이터 쓰기
-		}
+		// 로그 파일에 데이터 쓰기
+		// backup 엔티티 처리 상태 업데이트
 
 		return toDto(backup);
 	}
@@ -129,7 +128,7 @@ public class BackupService {
 		byte[] employeeData = csvProvider.loadEmployeeData();
 		Path path = Paths.get("system.user", "files");
 		Long length = (long)employeeData.length;
-		FileEntity fileEntity = fileRepository.save(new FileEntity(null, fileName, "csv", length, path.toString()));
+		FileEntity fileEntity = new FileEntity(null, fileName, "csv", length, path.toString());
 		return fileStorage.saveFile(fileEntity.getId(), employeeData, fileName, CSV_CONTENT_TYPE);
 	}
 
@@ -150,7 +149,8 @@ public class BackupService {
 	}
 
 	public CursorPageResponseBackupDto findWithSearchCondition(
-		LocalDateTime cursor, Status status,
+		LocalDateTime cursor,
+		Status status,
 		LocalDateTime startDate,
 		LocalDateTime endDate,
 		Pageable pageable
@@ -172,7 +172,7 @@ public class BackupService {
 			nextIdAfter = content.get(content.size() - 1).id();
 		}
 
-		long count = backupRepository.count();
+		long count = backupRepository.countBackups(status);
 		return new CursorPageResponseBackupDto(content, nextCursor, nextIdAfter, content.size(), slice.hasNext(),
 			count);
 	}
