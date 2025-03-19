@@ -15,16 +15,14 @@ import com.project.hrbank.entity.EmployeeLogs;
 public interface EmployeeLogRepository extends JpaRepository<EmployeeLogs, Long> {
 	boolean existsByChangedAtAfter(LocalDateTime lastBackupEndedAt);
 
-	// @Query("SELECT e FROM EmployeeLogs e WHERE e.changedAt < :cursor")
-	// Slice<EmployeeLogs> findAll(@Param("cursor") LocalDateTime cursor, Pageable pageable);
-
 	@Query("SELECT e FROM EmployeeLogs e " +
-		"WHERE e.changedAt < :cursor " +
-		// "AND e.changedAt BETWEEN :atFrom AND :atTo " +
-		"AND (:employeeNumber IS NULL OR e.employeeNumber LIKE %:employeeNumber%) " +
-		"AND (:memo IS NULL OR e.memo LIKE %:memo%) " +
-		"AND (:ipAddress IS NULL OR e.ipAddress LIKE %:ipAddress%) " +
-		"AND (:type IS NULL OR e.type LIKE %:type%)")
+		"WHERE (COALESCE(:cursor, e.changedAt) = e.changedAt OR e.changedAt < :cursor) " +
+		"AND (COALESCE(:atFrom, e.changedAt) = e.changedAt OR COALESCE(:atTo, e.changedAt) = e.changedAt OR e.changedAt BETWEEN :atFrom AND :atTo) "
+		+
+		"AND (:employeeNumber IS NULL OR e.employeeNumber LIKE CONCAT('%', :employeeNumber, '%')) " +
+		"AND (:memo IS NULL OR e.memo LIKE CONCAT('%', :memo, '%')) " +
+		"AND (:ipAddress IS NULL OR e.ipAddress LIKE CONCAT('%', :ipAddress, '%')) " +
+		"AND (:type IS NULL OR e.type LIKE CONCAT('%', :type, '%'))")
 	Slice<EmployeeLogs> findAll(
 		@Param("cursor") LocalDateTime cursor,
 		@Param("employeeNumber") String employeeNumber,
