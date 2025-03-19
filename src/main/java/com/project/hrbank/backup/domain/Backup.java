@@ -1,6 +1,7 @@
 package com.project.hrbank.backup.domain;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -92,7 +93,9 @@ public class Backup {
 	}
 
 	public Long getFileId() {
-		return this.file.getId();
+		return Optional.ofNullable(this.file)
+			.map(FileEntity::getId)
+			.orElse(null);
 	}
 
 }
