@@ -38,14 +38,7 @@ public class Department {
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 
-	public Department(String name, String description, LocalDate establishedDate) {
-		this.name = name;
-		this.description = description;
-		this.establishedDate = establishedDate;
-	}
-
-	public Department(Long id, String name, String description, LocalDate establishedDate) {
-		this.id = id;
+	public void update(String name, String description, LocalDate establishedDate) {
 		this.name = name;
 		this.description = description;
 		this.establishedDate = establishedDate;

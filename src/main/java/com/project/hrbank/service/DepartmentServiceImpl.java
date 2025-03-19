@@ -24,21 +24,13 @@ public class DepartmentServiceImpl implements DepartmentService {
 			throw new IllegalArgumentException("Department with name " + dto.name() + " already exists.");
 		}
 
-		Department department = new Department(
-			dto.name(),
-			dto.description(),
-			dto.establishedDate()
-		);
+		Department department = new Department();
+		department.update(dto.name(), dto.description(), dto.establishedDate());
+
 		departmentRepository.save(department);
 
-		return new DepartmentDto(
-			department.getId(),
-			department.getName(),
-			department.getDescription(),
-			department.getEstablishedDate(),
-			0,
-			department.getCreatedAt()
-		);
+		return new DepartmentDto(department.getId(), department.getName(), department.getDescription(),
+			department.getEstablishedDate(), 0, department.getCreatedAt());
 	}
 
 	@Override
@@ -47,57 +39,32 @@ public class DepartmentServiceImpl implements DepartmentService {
 		Department department = departmentRepository.findById(id)
 			.orElseThrow(() -> new IllegalArgumentException("Department not found with id: " + id));
 
-		return new DepartmentDto(
-			department.getId(),
-			department.getName(),
-			department.getDescription(),
-			department.getEstablishedDate(),
-			getEmployeeCount(department.getId()),
-			department.getCreatedAt()
-		);
+		return new DepartmentDto(department.getId(), department.getName(), department.getDescription(),
+			department.getEstablishedDate(), getEmployeeCount(department.getId()), department.getCreatedAt());
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public Page<DepartmentDto> getAllDepartments(Pageable pageable) {
 		return departmentRepository.findAll(pageable)
-			.map(department -> new DepartmentDto(
-				department.getId(),
-				department.getName(),
-				department.getDescription(),
-				department.getEstablishedDate(),
-				getEmployeeCount(department.getId()),
-				department.getCreatedAt()
-			));
+			.map(department -> new DepartmentDto(department.getId(), department.getName(), department.getDescription(),
+				department.getEstablishedDate(), getEmployeeCount(department.getId()), department.getCreatedAt()));
 	}
 
 	@Override
 	@Transactional
 	public DepartmentDto updateDepartment(Long id, DepartmentDto dto) {
-		Department existingDepartment = departmentRepository.findById(id)
+		Department department = departmentRepository.findById(id)
 			.orElseThrow(() -> new IllegalArgumentException("Department not found"));
 
-		if (!existingDepartment.getName().equals(dto.name()) && departmentRepository.existsByName(dto.name())) {
+		if (!department.getName().equals(dto.name()) && departmentRepository.existsByName(dto.name())) {
 			throw new IllegalArgumentException("Department name already exists");
 		}
 
-		Department updatedDepartment = new Department(
-			id,
-			dto.name(),
-			dto.description(),
-			dto.establishedDate()
-		);
+		department.update(dto.name(), dto.description(), dto.establishedDate());
 
-		departmentRepository.save(updatedDepartment);
-
-		return new DepartmentDto(
-			updatedDepartment.getId(),
-			updatedDepartment.getName(),
-			updatedDepartment.getDescription(),
-			updatedDepartment.getEstablishedDate(),
-			getEmployeeCount(updatedDepartment.getId()),
-			updatedDepartment.getCreatedAt()
-		);
+		return new DepartmentDto(department.getId(), department.getName(), department.getDescription(),
+			department.getEstablishedDate(), getEmployeeCount(department.getId()), department.getCreatedAt());
 	}
 
 	@Override
