@@ -15,7 +15,25 @@ import com.project.hrbank.entity.EmployeeLogs;
 public interface EmployeeLogRepository extends JpaRepository<EmployeeLogs, Long> {
 	boolean existsByChangedAtAfter(LocalDateTime lastBackupEndedAt);
 
-	@Query("SELECT e FROM EmployeeLogs e WHERE e.changedAt < :cursor")
-	Slice<EmployeeLogs> findAll(@Param("cursor") LocalDateTime cursor, Pageable pageable);
+	// @Query("SELECT e FROM EmployeeLogs e WHERE e.changedAt < :cursor")
+	// Slice<EmployeeLogs> findAll(@Param("cursor") LocalDateTime cursor, Pageable pageable);
+
+	@Query("SELECT e FROM EmployeeLogs e " +
+		"WHERE e.changedAt < :cursor " +
+		// "AND e.changedAt BETWEEN :atFrom AND :atTo " +
+		"AND (:employeeNumber IS NULL OR e.employeeNumber LIKE %:employeeNumber%) " +
+		"AND (:memo IS NULL OR e.memo LIKE %:memo%) " +
+		"AND (:ipAddress IS NULL OR e.ipAddress LIKE %:ipAddress%) " +
+		"AND (:type IS NULL OR e.type LIKE %:type%)")
+	Slice<EmployeeLogs> findAll(
+		@Param("cursor") LocalDateTime cursor,
+		@Param("employeeNumber") String employeeNumber,
+		@Param("memo") String memo,
+		@Param("ipAddress") String ipAddress,
+		@Param("type") String type,
+		@Param("atFrom") LocalDateTime atFrom,
+		@Param("atTo") LocalDateTime atTo,
+		Pageable pageable
+	);
 
 }

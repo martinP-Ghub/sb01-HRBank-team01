@@ -25,7 +25,8 @@ public class BasicEmployeeLogService implements EmployeeLogService {
 
 	@Override
 	@Transactional
-	public CursorPageResponse<EmployeeLogResponse> getLogs(LocalDateTime cursor, Pageable pageable) {
+	public CursorPageResponse<EmployeeLogResponse> getLogs(LocalDateTime cursor, String employeeNumber, String memo,
+		String ipAddress, String type, LocalDateTime atFrom, LocalDateTime atTo, Pageable pageable) {
 		return paginationService.getPaginatedResults(
 			cursor,
 			pageable,
@@ -33,7 +34,8 @@ public class BasicEmployeeLogService implements EmployeeLogService {
 			EmployeeLogMapper.INSTANT::toDto,
 			EmployeeLogs::getChangedAt,
 			EmployeeLogs::getLog_id,
-			repository::findAll
+			// repository::findAll
+			(cur, page) -> repository.findAll(cur, employeeNumber, memo, ipAddress, type, atFrom, atTo, page)
 		);
 	}
 

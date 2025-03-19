@@ -45,6 +45,11 @@ public class EmployeeLogRestController {
 	@Operation(summary = "직원 정보 수정 이력 목록 조회", description = "직원 정보 수정 이력 목록을 조회합니다. 상세 변경 내용은 포함되지 않습니다.")
 	public CursorPageResponse<EmployeeLogResponse> getLogList(
 		@RequestParam(defaultValue = "") String employeeNumber,
+		@RequestParam(defaultValue = "") String memo,
+		@RequestParam(defaultValue = "") String ipAddress,
+		@RequestParam(defaultValue = "") String type,
+		@RequestParam(defaultValue = "") LocalDateTime atFrom,
+		@RequestParam(defaultValue = "") LocalDateTime atTo,
 		@RequestParam(defaultValue = "30") int size,
 		@RequestParam(defaultValue = "at") String at,
 		@RequestParam(defaultValue = "desc") String sortDirection,
@@ -61,7 +66,7 @@ public class EmployeeLogRestController {
 		// Pageable 설정 후 데이터 조회
 		Pageable pageable = PageRequest.of(0, size, sort);
 
-		return service.getLogs(cursor, pageable);
+		return service.getLogs(cursor, employeeNumber, memo, ipAddress, type, atFrom, atTo, pageable);
 	}
 
 	/**
