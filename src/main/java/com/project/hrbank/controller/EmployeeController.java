@@ -1,40 +1,26 @@
 package com.project.hrbank.controller;
 
-import java.time.LocalDate;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.project.hrbank.dto.request.EmployeeRequestDto;
 import com.project.hrbank.dto.response.EmployeeResponseDto;
-import com.project.hrbank.entity.EmployeeStatus;
 import com.project.hrbank.service.EmployeeService;
-import com.project.hrbank.service.EmployeeServiceImpl;
+
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/employees")
+@RequiredArgsConstructor
 public class EmployeeController {
-	private final EmployeeService employeeService;
-	private final EmployeeServiceImpl employeeServiceImpl;
 
-	@Autowired
-	public EmployeeController(EmployeeService employeeService, EmployeeServiceImpl employeeServiceImpl) {
-		this.employeeService = employeeService;
-		this.employeeServiceImpl = employeeServiceImpl;
-	}
+	private final EmployeeService employeeService;
 
 	@PostMapping
 	public ResponseEntity<EmployeeResponseDto> registerEmployee(@RequestBody @Valid EmployeeRequestDto requestDto) {
@@ -45,17 +31,9 @@ public class EmployeeController {
 	@GetMapping
 	public ResponseEntity<Page<EmployeeResponseDto>> getEmployees(
 		@RequestParam(required = false) String nameOrEmail,
-		@RequestParam(required = false) String employeeNumber,
-		@RequestParam(required = false) String departmentName,
-		@RequestParam(required = false) String position,
-		@RequestParam(required = false) String hireDateFrom,
-		@RequestParam(required = false) String hireDateTo,
-		@RequestParam(required = false) EmployeeStatus status,
-		@RequestParam(required = false) Long lastEmployeeId,
+		@RequestParam(defaultValue = "0") int page,
 		@RequestParam(defaultValue = "30") int size) {
-		Page<EmployeeResponseDto> employees = employeeService.getEmployees(
-			nameOrEmail, employeeNumber, departmentName, position, hireDateFrom, hireDateTo, status, lastEmployeeId,
-			size);
+		Page<EmployeeResponseDto> employees = employeeService.getEmployees(nameOrEmail, page, size);
 		return ResponseEntity.ok(employees);
 	}
 
@@ -65,29 +43,13 @@ public class EmployeeController {
 		return ResponseEntity.ok(employee);
 	}
 
-	@PatchMapping("/{id}")
+	@PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<EmployeeResponseDto> updateEmployee(
 		@PathVariable Long id,
-		@RequestParam(required = false) String name,
-		@RequestParam(required = false) String email,
-		@RequestParam(required = false) Long departmentId,
-		@RequestParam(required = false) String position,
-		@RequestParam(required = false) String hireDate
+		@RequestPart(value = "employee", required = true) EmployeeRequestDto employeeDetails,
+		@RequestPart(value = "profile", required = false) MultipartFile profileImage
 	) {
-		EmployeeRequestDto requestDto = new EmployeeRequestDto();
-
-		if (name != null)
-			requestDto.setName(name);
-		if (email != null)
-			requestDto.setEmail(email);
-		if (departmentId != null)
-			requestDto.setDepartmentId(departmentId);
-		if (position != null)
-			requestDto.setPosition(position);
-		if (hireDate != null)
-			requestDto.setHireDate(LocalDate.parse(hireDate));
-
-		EmployeeResponseDto updatedEmployee = employeeService.updateEmployee(id, requestDto);
+		EmployeeResponseDto updatedEmployee = employeeService.updateEmployee(id, employeeDetails, profileImage);
 		return ResponseEntity.ok(updatedEmployee);
 	}
 
@@ -99,9 +61,7 @@ public class EmployeeController {
 
 	@GetMapping("/count")
 	public ResponseEntity<Long> countEmployees() {
-		long count = employeeServiceImpl.countActiveEmployees();
+		long count = employeeService.countActiveEmployees();
 		return ResponseEntity.ok(count);
 	}
-
 }
-
