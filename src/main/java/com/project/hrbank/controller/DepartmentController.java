@@ -1,7 +1,5 @@
 package com.project.hrbank.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -27,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 public class DepartmentController {
 
 	private final DepartmentService departmentService;
-	private static final Logger logger = LoggerFactory.getLogger(DepartmentController.class);
 
 	@PostMapping
 	public ResponseEntity<DepartmentDto> createDepartment(@RequestBody DepartmentDto dto) {
@@ -47,9 +44,7 @@ public class DepartmentController {
 		@RequestParam(defaultValue = "0") int page,
 		@RequestParam(defaultValue = "30") int size) {
 
-		logger.info("Received request for all departments");
 		Page<DepartmentDto> departments = departmentService.getAllDepartments(PageRequest.of(page, size));
-		logger.info("Returning departments: {}", departments.getContent());
 
 		return ResponseEntity.ok(departments);
 	}
