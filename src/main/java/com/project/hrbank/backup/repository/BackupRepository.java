@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.project.hrbank.backup.domain.Backup;
+import com.project.hrbank.backup.domain.Status;
 
 public interface BackupRepository extends JpaRepository<Backup, Long> {
 
@@ -19,6 +20,9 @@ public interface BackupRepository extends JpaRepository<Backup, Long> {
 	@Query("SELECT b FROM Backup b join fetch b.file WHERE b.createdAt < :cursor")
 	Slice<Backup> findAllBy(@Param("cursor") LocalDateTime cursor, Pageable pageable);
 
-	long count();
+	@Query(
+		"SELECT COUNT(b) FROM Backup b WHERE (:status IS NULL OR b.status = :status)"
+	)
+	long countBackups(@Param("status") Status status);
 
 }
