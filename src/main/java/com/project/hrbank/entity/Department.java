@@ -11,15 +11,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "departments")
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Department {
 
 	@Id
@@ -39,6 +38,19 @@ public class Department {
 	@CreationTimestamp
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;
+
+	public Department(String name, String description, LocalDate establishedDate) {
+		this.name = name;
+		this.description = description;
+		this.establishedDate = establishedDate;
+	}
+
+	public Department(Long id, String name, String description, LocalDate establishedDate) {
+		this.id = id;
+		this.name = name;
+		this.description = description;
+		this.establishedDate = establishedDate;
+	}
 }
 
 

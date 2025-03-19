@@ -24,10 +24,11 @@ public class DepartmentServiceImpl implements DepartmentService {
 			throw new IllegalArgumentException("Department with name " + dto.name() + " already exists.");
 		}
 
-		Department department = new Department();
-		department.setName(dto.name());
-		department.setDescription(dto.description());
-		department.setEstablishedDate(dto.establishedDate());
+		Department department = new Department(
+			dto.name(),
+			dto.description(),
+			dto.establishedDate()
+		);
 		departmentRepository.save(department);
 
 		return new DepartmentDto(
@@ -73,25 +74,29 @@ public class DepartmentServiceImpl implements DepartmentService {
 	@Override
 	@Transactional
 	public DepartmentDto updateDepartment(Long id, DepartmentDto dto) {
-		Department department = departmentRepository.findById(id)
+		Department existingDepartment = departmentRepository.findById(id)
 			.orElseThrow(() -> new IllegalArgumentException("Department not found"));
 
-		if (!department.getName().equals(dto.name()) && departmentRepository.existsByName(dto.name())) {
+		if (!existingDepartment.getName().equals(dto.name()) && departmentRepository.existsByName(dto.name())) {
 			throw new IllegalArgumentException("Department name already exists");
 		}
 
-		department.setName(dto.name());
-		department.setDescription(dto.description());
-		department.setEstablishedDate(dto.establishedDate());
-		departmentRepository.save(department);
+		Department updatedDepartment = new Department(
+			id,
+			dto.name(),
+			dto.description(),
+			dto.establishedDate()
+		);
+
+		departmentRepository.save(updatedDepartment);
 
 		return new DepartmentDto(
-			department.getId(),
-			department.getName(),
-			department.getDescription(),
-			department.getEstablishedDate(),
-			getEmployeeCount(department.getId()),
-			department.getCreatedAt()
+			updatedDepartment.getId(),
+			updatedDepartment.getName(),
+			updatedDepartment.getDescription(),
+			updatedDepartment.getEstablishedDate(),
+			getEmployeeCount(updatedDepartment.getId()),
+			updatedDepartment.getCreatedAt()
 		);
 	}
 
