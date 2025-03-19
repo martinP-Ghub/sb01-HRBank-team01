@@ -1,6 +1,7 @@
 package com.project.hrbank.backup.controller;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -29,8 +30,10 @@ public class BackupController {
 
 	@GetMapping
 	public ResponseEntity<CursorPageResponseBackupDto> findAll(
-		@RequestParam(required = false) LocalDateTime cursor,
+		@RequestParam(required = false) Instant cursor,
 		@RequestParam(required = false) Status status,
+		@RequestParam(required = false, name = "startedAtFrom") Instant startedAtFrom,
+		@RequestParam(required = false, name = "startedAtTo") Instant startedAtTo,
 		@PageableDefault(
 			size = 30,
 			page = 0,
@@ -38,7 +41,10 @@ public class BackupController {
 			direction = Sort.Direction.DESC
 		) Pageable pageable
 	) {
-		CursorPageResponseBackupDto backupDto = backupService.findAll(cursor, status, pageable);
+		cursor = Optional.ofNullable(cursor).orElse(Instant.now());
+		startedAtFrom = Optional.ofNullable(startedAtFrom).orElse(Instant.EPOCH);
+		startedAtTo = Optional.ofNullable(startedAtTo).orElse(Instant.now());
+		CursorPageResponseBackupDto backupDto = backupService.findAll(cursor, status, startedAtFrom, startedAtTo, pageable);
 		return ResponseEntity.ok().body(backupDto);
 	}
 

@@ -1,6 +1,6 @@
 package com.project.hrbank.backup.repository;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -19,12 +19,16 @@ public interface BackupRepository extends JpaRepository<Backup, Long> {
 
 	@Query(
 		"SELECT b FROM Backup b left join fetch b.file "
-			+ "WHERE b.createdAt < :cursor "
-			+ "AND (:status IS NULL OR b.status = :status)"
+			+ "WHERE b.startedAt < :cursor "
+			+ "AND (:status IS NULL OR b.status = :status) "
+			+ "AND b.startedAt >= :startedAtFrom "
+			+ "AND b.startedAt <= :startedAtTo"
 	)
 	Page<Backup> findAllBy(
-		@Param("cursor") LocalDateTime cursor,
+		@Param("cursor") Instant cursor,
 		@Param("status") Status status,
+		@Param("startedAtFrom") Instant startedAtFrom,
+		@Param("startedAtTo") Instant startedAtTo,
 		Pageable pageable
 	);
 

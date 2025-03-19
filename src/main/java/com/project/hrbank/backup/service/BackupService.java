@@ -1,9 +1,10 @@
 package com.project.hrbank.backup.service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +18,6 @@ import com.project.hrbank.backup.dto.response.BackupDto;
 import com.project.hrbank.backup.dto.response.CursorPageResponseBackupDto;
 import com.project.hrbank.backup.provider.EmployeesLogCsvFileProvider;
 import com.project.hrbank.backup.repository.BackupRepository;
-import com.project.hrbank.backup.repository.BackupRepositoryImpl;
 import com.project.hrbank.file.entity.FileEntity;
 import com.project.hrbank.repository.EmployeeLogRepository;
 
@@ -27,26 +27,26 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BackupService {
-	private static final LocalDateTime POSTGRESQL_MIN_TIMESTAMP = LocalDateTime.of(4713, 11, 24, 0, 0);
+	private static final Instant POSTGRESQL_MIN_TIMESTAMP = LocalDateTime.of(4713, 11, 24, 0, 0).toInstant(ZoneOffset.UTC);
 	private static final String SYSTEM_NAME = "SYSTEM";
 
 	private final BackupRepository backupRepository;
 	private final EmployeeLogRepository employeeLogRepository;
-	private final BackupRepositoryImpl backupRepositoryImpl;
 	private final EmployeesLogCsvFileProvider csvProvider;
 
 	public CursorPageResponseBackupDto findAll(
-		LocalDateTime cursor,
+		Instant cursor,
 		Status status,
+		Instant startedAtFrom,
+		Instant startedAtTo,
 		Pageable pageable
 	) {
-		cursor = Optional.ofNullable(cursor).orElse(LocalDateTime.now());
 
-		Page<Backup> page = backupRepository.findAllBy(cursor, status, pageable);
+		Page<Backup> page = backupRepository.findAllBy(cursor, status, startedAtFrom, startedAtTo, pageable);
 
 		List<BackupDto> content = getBackupContents(page);
 
-		LocalDateTime nextCursor = null;
+		Instant nextCursor = null;
 		if (page.hasContent()) {
 			nextCursor = content.get(content.size() - 1).startedAt();
 		}
@@ -55,7 +55,8 @@ public class BackupService {
 		if (page.hasNext() && page.hasContent()) {
 			nextIdAfter = content.get(content.size() - 1).id();
 		}
-
+		// TODO Type 변경 시 수정하기
+		// new CursorPageResponse<BackupDto>(content, nextCursor, nextIdAfter, content.size(), page.hasNext(), page.getTotalElements())
 		return new CursorPageResponseBackupDto(content, nextCursor, nextIdAfter, content.size(), page.hasNext(), page.getTotalElements());
 	}
 
@@ -75,7 +76,7 @@ public class BackupService {
 
 		Backup backup = generateBackup(clientIpAddr);
 
-		LocalDateTime lastEndedAtBackupDateTime = getLastEndedAt();
+		Instant lastEndedAtBackupDateTime = getLastEndedAt();
 		if (isNotChangedEmployeeInfo(lastEndedAtBackupDateTime)) {
 			backup.updateSkipped();
 			return toDto(backupRepository.save(backup));
@@ -92,15 +93,15 @@ public class BackupService {
 		return backup;
 	}
 
-	private LocalDateTime getLastEndedAt() {
+	private Instant getLastEndedAt() {
 		return backupRepository.findLastBackup().stream()
 			.findFirst()
 			.map(Backup::getEndedAt)
 			.orElse(POSTGRESQL_MIN_TIMESTAMP);
 	}
 
-	private boolean isNotChangedEmployeeInfo(LocalDateTime endedAt) {
-		return !employeeLogRepository.existsByChangedAtAfter(endedAt);
+	private boolean isNotChangedEmployeeInfo(Instant endedAt) {
+		return !employeeLogRepository.existsByChangedAtAfter(LocalDateTime.ofInstant(endedAt, ZoneOffset.UTC));
 	}
 
 	private void generateBackupFile(Backup backup) {
@@ -128,29 +129,4 @@ public class BackupService {
 		return BackupDto.toDto(backup);
 	}
 
-	public CursorPageResponseBackupDto findWithSearchCondition(
-		LocalDateTime cursor,
-		Status status,
-		LocalDateTime startDate,
-		LocalDateTime endDate,
-		Pageable pageable
-	) {
-		cursor = Optional.ofNullable(cursor).orElse(LocalDateTime.now());
-		Page<Backup> page = backupRepositoryImpl.findWithSearchCondition(cursor, status, startDate, endDate, pageable);
-
-		List<BackupDto> content = getBackupContents(page);
-
-		LocalDateTime nextCursor = null;
-		if (page.hasContent()) {
-			nextCursor = content.get(content.size() - 1).startedAt();
-		}
-
-		// 다음 페이지 존재 여부 확인
-		Long nextIdAfter = null;
-		if (page.hasNext() && page.hasContent()) {
-			nextIdAfter = content.get(content.size() - 1).id();
-		}
-
-		return new CursorPageResponseBackupDto(content, nextCursor, nextIdAfter, content.size(), page.hasNext(), page.getTotalElements());
-	}
 }
