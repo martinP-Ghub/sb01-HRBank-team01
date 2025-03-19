@@ -29,8 +29,14 @@ public class DepartmentServiceImpl implements DepartmentService {
 
 		departmentRepository.save(department);
 
-		return new DepartmentDto(department.getId(), department.getName(), department.getDescription(),
-			department.getEstablishedDate(), 0, department.getCreatedAt());
+		return new DepartmentDto(
+			department.getId(),
+			department.getName(),
+			department.getDescription(),
+			department.getEstablishedDate(),
+			0,
+			department.getCreatedAt()
+		);
 	}
 
 	@Override
@@ -39,8 +45,14 @@ public class DepartmentServiceImpl implements DepartmentService {
 		Department department = departmentRepository.findById(id)
 			.orElseThrow(() -> new IllegalArgumentException("Department not found with id: " + id));
 
-		return new DepartmentDto(department.getId(), department.getName(), department.getDescription(),
-			department.getEstablishedDate(), getEmployeeCount(department.getId()), department.getCreatedAt());
+		return new DepartmentDto(
+			department.getId(),
+			department.getName(),
+			department.getDescription(),
+			department.getEstablishedDate(),
+			getEmployeeCount(department.getId()),
+			department.getCreatedAt()
+		);
 	}
 
 	@Override
