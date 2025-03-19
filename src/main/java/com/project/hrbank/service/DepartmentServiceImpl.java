@@ -1,7 +1,5 @@
 package com.project.hrbank.service;
 
-import java.util.Optional;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -44,16 +42,18 @@ public class DepartmentServiceImpl implements DepartmentService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Optional<DepartmentDto> getDepartmentById(Long id) {
-		return departmentRepository.findById(id)
-			.map(department -> new DepartmentDto(
-				department.getId(),
-				department.getName(),
-				department.getDescription(),
-				department.getEstablishedDate(),
-				getEmployeeCount(department.getId()), // Keep this if employeeCount is needed
-				department.getCreatedAt()
-			));
+	public DepartmentDto getDepartmentById(Long id) {
+		Department department = departmentRepository.findById(id)
+			.orElseThrow(() -> new IllegalArgumentException("Department not found with id: " + id));
+
+		return new DepartmentDto(
+			department.getId(),
+			department.getName(),
+			department.getDescription(),
+			department.getEstablishedDate(),
+			getEmployeeCount(department.getId()),
+			department.getCreatedAt()
+		);
 	}
 
 	@Override
