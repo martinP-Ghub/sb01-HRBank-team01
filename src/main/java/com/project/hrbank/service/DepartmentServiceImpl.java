@@ -75,8 +75,14 @@ public class DepartmentServiceImpl implements DepartmentService {
 
 		department.update(dto.name(), dto.description(), dto.establishedDate());
 
-		return new DepartmentDto(department.getId(), department.getName(), department.getDescription(),
-			department.getEstablishedDate(), getEmployeeCount(department.getId()), department.getCreatedAt());
+		return new DepartmentDto(
+			department.getId(),
+			department.getName(),
+			department.getDescription(),
+			department.getEstablishedDate(),
+			getEmployeeCount(department.getId()),
+			department.getCreatedAt()
+		);
 	}
 
 	@Override
