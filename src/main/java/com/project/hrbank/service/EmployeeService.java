@@ -13,13 +13,11 @@ public interface EmployeeService {
 		EmployeeStatus status, int page, int size, String sortField,
 		String sortDirection);
 
-	EmployeeResponseDto registerEmployee(EmployeeRequestDto requestDto);
-
 	EmployeeResponseDto getEmployeeById(Long id);
 
+	EmployeeResponseDto registerEmployee(EmployeeRequestDto requestDto, MultipartFile profileImage);
 	long countActiveEmployees();
 
-	@Transactional
 	EmployeeResponseDto updateEmployee(Long id, EmployeeRequestDto dto, MultipartFile profileImage);
 
 	void deleteEmployee(Long id);

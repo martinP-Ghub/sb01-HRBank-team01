@@ -55,10 +55,3 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 	@Query("SELECT COUNT(e) FROM Employee e WHERE YEAR(e.hireDate) = YEAR(CURRENT_DATE)")
 	long countEmployeesForCurrentYear();
 }
-
-
-
-
-
-
-

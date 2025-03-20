@@ -23,11 +23,15 @@ public class EmployeeController {
 
 	private final EmployeeService employeeService;
 
-	@PostMapping
-	public ResponseEntity<EmployeeResponseDto> registerEmployee(@RequestBody @Valid EmployeeRequestDto requestDto) {
-		EmployeeResponseDto responseDto = employeeService.registerEmployee(requestDto);
+	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<EmployeeResponseDto> registerEmployee(
+		@RequestPart(value = "employee", required = true) @Valid EmployeeRequestDto requestDto,
+		@RequestPart(value = "profile", required = false) MultipartFile profileImage
+	) {
+		EmployeeResponseDto responseDto = employeeService.registerEmployee(requestDto, profileImage);
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
 	}
+
 
 	@GetMapping
 	public ResponseEntity<Page<EmployeeResponseDto>> getEmployees(
