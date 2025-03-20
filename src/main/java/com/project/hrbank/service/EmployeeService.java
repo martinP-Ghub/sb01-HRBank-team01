@@ -1,12 +1,11 @@
 package com.project.hrbank.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.project.hrbank.dto.request.EmployeeRequestDto;
 import com.project.hrbank.dto.response.EmployeeResponseDto;
 import com.project.hrbank.entity.EmployeeStatus;
-
-import org.springframework.data.domain.Page;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 public interface EmployeeService {
 	Page<EmployeeResponseDto> getEmployees(String nameOrEmail, String departmentName, String position,
@@ -16,6 +15,7 @@ public interface EmployeeService {
 	EmployeeResponseDto getEmployeeById(Long id);
 
 	EmployeeResponseDto registerEmployee(EmployeeRequestDto requestDto, MultipartFile profileImage);
+
 	long countActiveEmployees();
 
 	EmployeeResponseDto updateEmployee(Long id, EmployeeRequestDto dto, MultipartFile profileImage);

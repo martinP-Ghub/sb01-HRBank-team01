@@ -2,7 +2,6 @@ package com.project.hrbank.file.storage;
 
 import java.io.InputStream;
 
-import com.project.hrbank.file.dto.FileDto;
 import com.project.hrbank.file.entity.FileEntity;
 
 public interface FileStorage {

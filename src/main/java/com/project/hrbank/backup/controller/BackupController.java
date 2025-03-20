@@ -3,8 +3,6 @@ package com.project.hrbank.backup.controller;
 import java.time.LocalDateTime;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,12 +32,7 @@ public class BackupController {
 		@RequestParam(required = false) Status status,
 		@RequestParam(required = false, name = "startedAtFrom") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startedAtFrom,
 		@RequestParam(required = false, name = "startedAtTo") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startedAtTo,
-		@PageableDefault(
-			size = 30,
-			page = 0,
-			sort = "startedAt",
-			direction = Sort.Direction.DESC
-		) Pageable pageable
+		Pageable pageable
 	) {
 
 		CursorPageResponseBackupDto backupDto = backupService.findAll(cursor, status, startedAtFrom, startedAtTo, pageable);

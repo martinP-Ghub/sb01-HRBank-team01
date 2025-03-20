@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.project.hrbank.file.dto.FileDto;
 import com.project.hrbank.file.entity.FileEntity;
 import com.project.hrbank.file.service.FileService;
 import com.project.hrbank.file.storage.FileStorage;
@@ -29,7 +28,6 @@ public class FileController {
 
 	private final FileService fileService;
 	private final FileStorage fileStorage;
-
 
 	@GetMapping("/{id}/download")
 	public ResponseEntity<?> download(@PathVariable Long id) {

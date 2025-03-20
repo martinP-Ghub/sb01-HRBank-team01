@@ -30,7 +30,7 @@ public class LogFileHandler implements FileHandler {
 	}
 
 	@Override
-	public byte[] processFileData(String fileName , byte[] fileData) throws IOException {
+	public byte[] processFileData(String fileName, byte[] fileData) throws IOException {
 		Path filePath = Paths.get(LOG_STORAGE_PATH + fileName);
 		Files.createDirectories(filePath.getParent());
 
