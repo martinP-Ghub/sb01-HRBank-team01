@@ -250,11 +250,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 			jdbcTemplate.update(
 				sql,
-				type,               // type (필수)
+				type,
 				jsonString,         // changed_value (JSONB로 캐스팅)
-				"127.0.0.1",        // 더미 IP
-				employeeNumber,        // 더미 직원 번호
-				LocalDateTime.now() // changed_at (현재 시간)
+				"127.0.0.1",
+				employeeNumber,
+				LocalDateTime.now()
 			);
 
 		} catch (JsonProcessingException e) {
