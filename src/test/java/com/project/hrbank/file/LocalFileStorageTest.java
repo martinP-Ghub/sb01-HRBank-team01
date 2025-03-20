@@ -96,4 +96,5 @@ class LocalFileStorageTest {
 
 		assertTrue(exception.getMessage().contains("잘못된 파일명: " + fileName));
 	}
+	
 }
