@@ -85,13 +85,6 @@ public class DepartmentServiceImpl implements DepartmentService {
 			));
 	}
 
-	private String cleanSearchParam(String search) {
-		if (search == null || search.isBlank()) {
-			return null;
-		}
-		return "%" + search.toLowerCase() + "%";
-	}
-
 	@Override
 	@Transactional
 	public DepartmentDto updateDepartment(Long id, DepartmentDto dto) {
