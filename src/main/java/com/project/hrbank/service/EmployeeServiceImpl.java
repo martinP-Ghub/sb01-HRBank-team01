@@ -2,15 +2,19 @@ package com.project.hrbank.service;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.hrbank.dto.request.EmployeeRequestDto;
 import com.project.hrbank.dto.response.EmployeeResponseDto;
 import com.project.hrbank.entity.Employee;
+import com.project.hrbank.entity.EmployeeLogs;
 import com.project.hrbank.entity.EmployeeStatus;
 import com.project.hrbank.repository.EmployeeLogRepository;
 import com.project.hrbank.repository.EmployeeRepository;
@@ -23,14 +27,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class EmployeeServiceImpl implements EmployeeService {
+
+	private final JdbcTemplate jdbcTemplate;
 
 	private final EmployeeRepository employeeRepository;
 	private final EmployeeLogRepository employeeLogRepository;
@@ -41,8 +47,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 		if (employeeRepository.existsByEmail(requestDto.getEmail())) {
 			throw new IllegalArgumentException("중복된 이메일입니다.");
 		}
+		String employeeNumber = generateEmployeeNumber();
 
 		Employee employee = Employee.builder()
+			.employeeNumber(employeeNumber)
 			.name(requestDto.getName())
 			.email(requestDto.getEmail())
 			.departmentId(requestDto.getDepartmentId())
@@ -50,10 +58,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 			.hireDate(requestDto.getHireDate())
 			.status(EmployeeStatus.ACTIVE)
 			.build();
+		Employee savedEmployee = employeeRepository.save(employee);
 
-		employeeRepository.save(employee);
 
 		List<Map<String, Object>> logData = new ArrayList<>();
+		logData.add(createLogEntry("employee_number", null, savedEmployee.getEmployeeNumber()));
 		logData.add(createLogEntry("hire_date", null, employee.getHireDate().toString()));
 		logData.add(createLogEntry("name", null, employee.getName()));
 		logData.add(createLogEntry("position", null, employee.getPosition()));
@@ -61,7 +70,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		logData.add(createLogEntry("email", null, employee.getEmail()));
 		logData.add(createLogEntry("status", null, employee.getStatus().toString()));
 
-		saveLog("CREATED", logData);
+		saveLog("CREATED", logData, savedEmployee.getEmployeeNumber());
 
 		return convertToDto(employee);
 	}
@@ -92,8 +101,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		return employeeRepository.countByStatus(EmployeeStatus.ACTIVE);
 	}
 
-	@Override
-	@Transactional
+	@Override//@Transactional 사용위치 확인 후 수정 클래스? 메서드? // 코드 컨벤션 지켜서 작성하기
 	public EmployeeResponseDto updateEmployee(Long id, EmployeeRequestDto dto, MultipartFile profileImage) {
 		Employee existingEmployee = employeeRepository.findById(id)
 			.orElseThrow(() -> new IllegalArgumentException("직원을 찾을 수 없습니다."));
@@ -146,9 +154,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 			existingEmployee.setProfileImageId(profileImageId);
 		}
 
-		employeeRepository.save(existingEmployee);
+		String employeeNumber = existingEmployee.getEmployeeNumber();
 
-		saveLog("UPDATED", logData);
+		saveLog("UPDATED", logData, employeeNumber);
 
 		return convertToDto(existingEmployee);
 	}
@@ -172,6 +180,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 		List<Map<String, Object>> logData = new ArrayList<>();
 
+		logData.add(createLogEntry("employee_number", employee.getEmployeeNumber(), null));
 		logData.add(createLogEntry("hire_date",
 			employee.getHireDate() != null ? employee.getHireDate().toString() : null,
 			null));
@@ -185,7 +194,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 			employee.getStatus() != null ? employee.getStatus().toString() : null,
 			null));
 
-		saveLog("DELETED", logData);
+		saveLog("DELETED", logData, employee.getEmployeeNumber());
 
 		employeeRepository.deleteById(id);
 	}
@@ -219,16 +228,41 @@ public class EmployeeServiceImpl implements EmployeeService {
 				return employeeRepository.countEmployeesForCurrentYear();
 			default:
 				throw new IllegalArgumentException("Invalid unit: " + unit);
-		}
+		} //enum으로 변경 가능한지
 	}
 
-	private void saveLog(String type, List<Map<String, Object>> logEntries) {
+	private void saveLog(String type, List<Map<String, Object>> logEntries, String employeeNumber) {
 		Map<String, Object> finalLog = new HashMap<>();
 		finalLog.put("type", type);
 		finalLog.put("changes", logEntries);
 
-		logger.info(finalLog.toString());
+		try {
+			String jsonString = new ObjectMapper().writeValueAsString(finalLog);
+			logger.info("로그 출력: {}", jsonString);
+
+			// 모든 NOT NULL 컬럼에 더미 값 추가
+			String sql = """
+            INSERT INTO employee_change_logs 
+                (type, changed_value, ip, employee_number, changed_at)
+            VALUES 
+                (?, ?::jsonb, ?, ?, ?)
+            """;
+
+			jdbcTemplate.update(
+				sql,
+				type,               // type (필수)
+				jsonString,         // changed_value (JSONB로 캐스팅)
+				"127.0.0.1",        // 더미 IP
+				employeeNumber,        // 더미 직원 번호
+				LocalDateTime.now() // changed_at (현재 시간)
+			);
+
+		} catch (JsonProcessingException e) {
+			logger.error("JSON 변환 실패", e);
+		}
 	}
+
+
 
 	private Map<String, Object> createLogEntry(String propertyName, String before, String after) {
 		Map<String, Object> entry = new HashMap<>();
