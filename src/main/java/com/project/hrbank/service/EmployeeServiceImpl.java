@@ -210,7 +210,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	private String generateEmployeeNumber() {
 		long count = employeeRepository.count() + 1;
-		return String.format("EMP%06d", count);
+		return String.format("EMP%03d", count);
 
 	}
 
