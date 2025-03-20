@@ -25,7 +25,8 @@ public class BasicEmployeeLogService implements EmployeeLogService {
 
 	@Override
 	@Transactional
-	public CursorPageResponse<EmployeeLogResponse> getLogs(LocalDateTime cursor, Pageable pageable) {
+	public CursorPageResponse<EmployeeLogResponse> getLogs(LocalDateTime cursor, String employeeNumber, String memo,
+		String ipAddress, String type, LocalDateTime atFrom, LocalDateTime atTo, Pageable pageable) {
 		return paginationService.getPaginatedResults(
 			cursor,
 			pageable,
@@ -33,23 +34,18 @@ public class BasicEmployeeLogService implements EmployeeLogService {
 			EmployeeLogMapper.INSTANT::toDto,
 			EmployeeLogs::getChangedAt,
 			EmployeeLogs::getLog_id,
-			repository::findAll
+			(cur, page) -> repository.findAll(cur, employeeNumber, memo, ipAddress, type, atFrom, atTo, page)
 		);
 	}
 
 	@Override
 	public String getLogById(Long id) {
+		EmployeeLogs response = repository.findById(id)
+			.orElseThrow(() -> new IllegalArgumentException("저장되지 않았거나, 삭제된 아이디입니다." + id));
 
-		try {
-			EmployeeLogs response = repository.findById(id)
-				.orElseThrow(() -> new IllegalArgumentException("저장되지 않았거나, 삭제된 아이디입니다." + id));
+		String diff = response.getChangedValue();
 
-			String diff = response.getChangedValue();
-
-			return diff;
-		} catch (NullPointerException e) {
-			throw new NullPointerException("ID를 찾을 수 없습니다." + e.getMessage());
-		}
+		return diff;
 	}
 
 	@Override

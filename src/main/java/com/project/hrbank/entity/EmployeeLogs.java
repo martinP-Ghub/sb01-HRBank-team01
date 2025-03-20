@@ -23,7 +23,6 @@ public class EmployeeLogs {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	// @Column(name = "log_id");
 	private Long log_id;
 
 	@Column(nullable = false)
