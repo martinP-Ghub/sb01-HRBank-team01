@@ -2,7 +2,6 @@ package com.project.hrbank.backup.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -120,7 +119,7 @@ public class BackupService {
 		return backupRepository.findLastBackup()
 			.stream()
 			.findFirst()
-			.orElseThrow(() -> new NoSuchElementException("Not found Backup"));
+			.orElse(null);
 	}
 
 	private BackupDto toDto(Backup backup) {

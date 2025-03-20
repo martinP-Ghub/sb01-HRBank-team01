@@ -26,9 +26,9 @@ import com.project.hrbank.repository.EmployeeRepository;
 @Component
 public class EmployeesLogCsvFileProvider {
 
-	public static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
-	public static final String BACKUP_FILE_NAME = "backup_employee";
-	public static final String CSV_HEADER_CONTENT = "ID,직원번호,이름,부서,직급,입사일,상태";
+	private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+	private static final String BACKUP_FILE_NAME = "backup_employee";
+	private static final String CSV_HEADER_CONTENT = "ID,직원번호,이름,부서,직급,입사일,상태";
 
 	private final Path DIRECTORY;
 	private final EmployeeRepository employeeRepository;
@@ -76,7 +76,7 @@ public class EmployeesLogCsvFileProvider {
 
 				page++;
 			} while (employeePage.hasNext());
-			
+
 			long fileSize = Files.size(employeesLogFilePath);
 			FileEntity fileEntity = new FileEntity(fileName, FileExtension.CSV.getDescription(), fileSize, employeesLogFilePath.getParent().toString());
 			return Optional.of(fileEntity);
