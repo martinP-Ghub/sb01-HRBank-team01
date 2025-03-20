@@ -13,10 +13,10 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @Component
 public class CustomPageableArgumentResolver extends PageableHandlerMethodArgumentResolver {
 
-	public static final String PAGE = "page";
-	public static final String SIZE = "size";
-	public static final String SORT_FIELD_KEY = "sortField";
-	public static final String SORT_DIRECTION_KEY = "sortDirection";
+	private static final String PAGE = "page";
+	private static final String SIZE = "size";
+	private static final String SORT_FIELD_KEY = "sortField";
+	private static final String SORT_DIRECTION_KEY = "sortDirection";
 
 	@Override
 	public Pageable resolveArgument(
