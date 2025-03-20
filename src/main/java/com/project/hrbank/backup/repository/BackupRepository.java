@@ -1,6 +1,6 @@
 package com.project.hrbank.backup.repository;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -14,7 +14,7 @@ import com.project.hrbank.backup.domain.Status;
 
 public interface BackupRepository extends JpaRepository<Backup, Long> {
 
-	@Query("select b from Backup b order by b.endedAt DESC LIMIT 1")
+	@Query(value = "SELECT * FROM backups ORDER BY ended_at DESC LIMIT 1", nativeQuery = true)
 	Optional<Backup> findLastBackup();
 
 	@Query(
@@ -25,10 +25,10 @@ public interface BackupRepository extends JpaRepository<Backup, Long> {
 			+ "AND b.startedAt <= :startedAtTo"
 	)
 	Page<Backup> findAllBy(
-		@Param("cursor") Instant cursor,
+		@Param("cursor") LocalDateTime cursor,
 		@Param("status") Status status,
-		@Param("startedAtFrom") Instant startedAtFrom,
-		@Param("startedAtTo") Instant startedAtTo,
+		@Param("startedAtFrom") LocalDateTime startedAtFrom,
+		@Param("startedAtTo") LocalDateTime startedAtTo,
 		Pageable pageable
 	);
 

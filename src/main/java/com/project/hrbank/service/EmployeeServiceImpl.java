@@ -11,6 +11,7 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.hrbank.dto.DepartmentDto;
 import com.project.hrbank.dto.request.EmployeeRequestDto;
 import com.project.hrbank.dto.response.EmployeeResponseDto;
 import com.project.hrbank.entity.Employee;
@@ -39,7 +40,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	private final JdbcTemplate jdbcTemplate;
 
 	private final EmployeeRepository employeeRepository;
-	private final EmployeeLogRepository employeeLogRepository;
+	private final DepartmentService departmentService;
 	private static final Logger logger = LoggerFactory.getLogger(EmployeeServiceImpl.class);
 
 	@Override
@@ -74,11 +75,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 		logData.add(createLogEntry("department", null, String.valueOf(employee.getDepartmentId())));
 		logData.add(createLogEntry("email", null, employee.getEmail()));
 		logData.add(createLogEntry("status", null, employee.getStatus().toString()));
-		if (employee.getProfileImageId() != null) {
-			logData.add(createLogEntry("profile_image", null, String.valueOf(employee.getProfileImageId())));
+		if (requestDto.getMemo() != null && !requestDto.getMemo().isEmpty()) {
+			logData.add(createLogEntry("memo", null, requestDto.getMemo()));
 		}
 
-		saveLog("CREATED", logData, savedEmployee.getEmployeeNumber());
+		saveLog("CREATED", logData, savedEmployee.getEmployeeNumber(), requestDto.getMemo());
 
 		return convertToDto(employee);
 	}
@@ -89,12 +90,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 		Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
 		Pageable pageable = PageRequest.of(page, size, sort);
 
-		return employeeRepository.findFilteredEmployees(
+		Page<Employee> employees = employeeRepository.findFilteredEmployees(
 			departmentName,
 			position,
 			status,
 			pageable
-		).map(this::convertToDto);
+		);
+
+		return employees.map(this::convertToDto);
 	}
 
 	@Override
@@ -108,6 +111,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public long countActiveEmployees() {
 		return employeeRepository.countByStatus(EmployeeStatus.ACTIVE);
 	}
+
 	//@Transactional 사용위치 확인 후 수정 클래스? 메서드? // 코드 컨벤션 지켜서 작성하기
 	@Override
 	@Transactional
@@ -165,7 +169,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 		String employeeNumber = existingEmployee.getEmployeeNumber();
 
-		saveLog("UPDATED", logData, employeeNumber);
+		saveLog("UPDATED", logData, employeeNumber, dto.getMemo());
 
 		return convertToDto(existingEmployee);
 	}
@@ -203,14 +207,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 			employee.getStatus() != null ? employee.getStatus().toString() : null,
 			null));
 
-		saveLog("DELETED", logData, employee.getEmployeeNumber());
-
+		saveLog("DELETED", logData, employee.getEmployeeNumber(), null);
 		employeeRepository.deleteById(id);
 	}
 
 	private String generateEmployeeNumber() {
 		long count = employeeRepository.count() + 1;
-		return String.format("EMP%06d", count);
+		return String.format("EMP%03d", count);
 
 	}
 
@@ -240,38 +243,33 @@ public class EmployeeServiceImpl implements EmployeeService {
 		} //enum으로 변경 가능한지
 	}
 
-	private void saveLog(String type, List<Map<String, Object>> logEntries, String employeeNumber) {
-		Map<String, Object> finalLog = new HashMap<>();
-		finalLog.put("type", type);
-		finalLog.put("changes", logEntries);
+	private void saveLog(String type, List<Map<String, Object>> logEntries, String employeeNumber, String memo) {
 
 		try {
-			String jsonString = new ObjectMapper().writeValueAsString(finalLog);
+			String jsonString = new ObjectMapper().writeValueAsString(logEntries);
 			logger.info("로그 출력: {}", jsonString);
 
-			// 모든 NOT NULL 컬럼에 더미 값 추가
 			String sql = """
             INSERT INTO employee_change_logs 
-                (type, changed_value, ip, employee_number, changed_at)
+                (type, changed_value, ip, employee_number, changed_at, memo)
             VALUES 
-                (?, ?::jsonb, ?, ?, ?)
+                (?, ?::jsonb, ?, ?, ?, ?)
             """;
 
 			jdbcTemplate.update(
 				sql,
 				type,
-				jsonString,         // changed_value (JSONB로 캐스팅)
+				jsonString,
 				"127.0.0.1",
 				employeeNumber,
-				LocalDateTime.now()
+				LocalDateTime.now(),
+				memo
 			);
 
 		} catch (JsonProcessingException e) {
 			logger.error("JSON 변환 실패", e);
 		}
 	}
-
-
 
 	private Map<String, Object> createLogEntry(String propertyName, String before, String after) {
 		Map<String, Object> entry = new HashMap<>();
@@ -282,12 +280,15 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	private EmployeeResponseDto convertToDto(Employee employee) {
+		DepartmentDto departmentDto = departmentService.getDepartmentById(employee.getDepartmentId());
+
 		return EmployeeResponseDto.builder()
 			.id(employee.getEmployeeId())
 			.name(employee.getName())
 			.email(employee.getEmail())
 			.employeeNumber(employee.getEmployeeNumber())
 			.departmentId(employee.getDepartmentId())
+			.departmentName(departmentDto.name())
 			.position(employee.getPosition())
 			.hireDate(employee.getHireDate())
 			.status(employee.getStatus())

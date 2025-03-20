@@ -29,5 +29,6 @@ public class EmployeeRequestDto {
 	private LocalDate hireDate;
 	private EmployeeStatus status;
 	private Long profileImageId;
+	private String memo;
 }
 

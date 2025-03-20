@@ -13,7 +13,7 @@ import com.project.hrbank.entity.EmployeeLogs;
 
 @Repository
 public interface EmployeeLogRepository extends JpaRepository<EmployeeLogs, Long> {
-	boolean existsByChangedAtAfter(LocalDateTime lastBackupEndedAt);
+	boolean existsByChangedAtAfter(LocalDateTime changedAt);
 
 	@Query("SELECT e FROM EmployeeLogs e " +
 		"WHERE (COALESCE(:cursor, e.changedAt) = e.changedAt OR e.changedAt < :cursor) " +

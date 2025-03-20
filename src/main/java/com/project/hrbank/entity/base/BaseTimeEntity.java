@@ -1,6 +1,6 @@
 package com.project.hrbank.entity.base;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -17,6 +17,6 @@ public abstract class BaseTimeEntity {
 
 	@CreatedDate
 	@Column(name = "created_at", nullable = false, updatable = false)
-	private Instant createdAt;
+	private LocalDateTime createdAt;
 
 }
