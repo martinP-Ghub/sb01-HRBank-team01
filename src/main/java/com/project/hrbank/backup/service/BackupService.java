@@ -8,7 +8,6 @@ import java.util.NoSuchElementException;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,7 +59,7 @@ public class BackupService {
 		return new CursorPageResponseBackupDto(content, nextCursor, nextIdAfter, content.size(), page.hasNext(), page.getTotalElements());
 	}
 
-	private List<BackupDto> getBackupContents(Slice<Backup> slice) {
+	private List<BackupDto> getBackupContents(Page<Backup> slice) {
 		return slice.getContent()
 			.stream()
 			.map(this::toDto)

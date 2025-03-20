@@ -62,23 +62,4 @@ public class BackupController {
 		return ResponseEntity.ok().body(backupDto);
 	}
 
-	/**
-	 *  동적 쿼리 테스트
-	 */
-	// @GetMapping
-	// public ResponseEntity<CursorPageResponseBackupDto> findAll(
-	// 	@RequestParam(required = false) LocalDateTime cursor,
-	// 	@RequestParam(required = false) Status status,
-	// 	@RequestParam(required = false) LocalDateTime startDate,
-	// 	@RequestParam(required = false) LocalDateTime endDate,
-	// 	@PageableDefault(
-	// 		size = 30,
-	// 		page = 0,
-	// 		sort = "startedAt",
-	// 		direction = Sort.Direction.DESC
-	// 	) Pageable pageable
-	// ) {
-	// 	CursorPageResponseBackupDto backupDto = backupService.findWithSearchCondition(cursor, status, startDate, endDate, pageable);
-	// 	return ResponseEntity.ok().body(backupDto);
-	// }
 }

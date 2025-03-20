@@ -32,7 +32,7 @@ public class EmployeesLogCsvFileProvider {
 
 	public EmployeesLogCsvFileProvider(EmployeeRepository employeeRepository) {
 		this.employeeRepository = employeeRepository;
-		DIRECTORY = Paths.get(System.getProperty("user.dir"), "/files", "employee_log");
+		DIRECTORY = Paths.get(System.getProperty("user.dir"), "files", "employee_log");
 
 		if (Files.notExists(DIRECTORY)) {
 			try {
@@ -52,11 +52,10 @@ public class EmployeesLogCsvFileProvider {
 		) {
 			bufferedWriter.write(CSV_HEADER_CONTENT);
 
-			int page = 0;
-			int batchSize = 1000;
 			Page<Employee> employeePage;
-
 			do {
+				int page = 0;
+				int batchSize = 1000;
 				Pageable pageable = PageRequest.of(page, batchSize, Sort.by("employeeId").ascending());
 				employeePage = employeeRepository.findAll(pageable);
 
@@ -68,7 +67,7 @@ public class EmployeesLogCsvFileProvider {
 			} while (employeePage.hasNext());
 
 			long fileSize = Files.size(filePathName);
-			return new FileEntity(fileName, "csv", fileSize, filePathName.getParent().toString());
+			return new FileEntity(fileName, CSV_EXTENSION, fileSize, filePathName.getParent().toString());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
