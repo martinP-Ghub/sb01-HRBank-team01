@@ -31,6 +31,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.hrbank.dto.DepartmentDto;
+import com.project.hrbank.dto.request.EmployeeRequestDto;
+import com.project.hrbank.dto.response.EmployeeResponseDto;
+import com.project.hrbank.entity.Employee;
+import com.project.hrbank.entity.EmployeeStatus;
+import com.project.hrbank.repository.EmployeeRepository;
+import com.project.hrbank.util.IpUtils;
+
+import lombok.RequiredArgsConstructor;
+
 @Service
 @RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
@@ -258,7 +270,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 				sql,
 				type,
 				jsonString,
-				"127.0.0.1",
+				IpUtils.getClientIp(),
 				employeeNumber,
 				LocalDateTime.now(),
 				memo

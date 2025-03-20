@@ -1,6 +1,8 @@
 package com.project.hrbank.service;
 
 import java.time.LocalDate;
+import org.springframework.data.domain.Page;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.project.hrbank.dto.request.EmployeeRequestDto;
 import com.project.hrbank.dto.response.EmployeeResponseDto;
@@ -17,6 +19,8 @@ public interface EmployeeService {
 	EmployeeResponseDto getEmployeeById(Long id);
 
 	EmployeeResponseDto registerEmployee(EmployeeRequestDto requestDto, MultipartFile profileImage);
+
+	long countActiveEmployees();
 
 	EmployeeResponseDto updateEmployee(Long id, EmployeeRequestDto dto, MultipartFile profileImage);
 

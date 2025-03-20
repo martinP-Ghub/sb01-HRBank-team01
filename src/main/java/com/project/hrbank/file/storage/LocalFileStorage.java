@@ -7,14 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.project.hrbank.file.FileHandlerFactory;
-import com.project.hrbank.file.dto.FileDto;
 import com.project.hrbank.file.entity.FileEntity;
 import com.project.hrbank.file.repository.FileRepository;
 
@@ -100,7 +95,6 @@ public class LocalFileStorage implements FileStorage {
 			throw new RuntimeException("파일 스트림 생성 실패", e);
 		}
 	}
-
 
 	@Override
 	public boolean delete(Long id) {

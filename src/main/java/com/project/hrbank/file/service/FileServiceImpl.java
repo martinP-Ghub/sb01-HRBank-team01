@@ -41,7 +41,7 @@ public class FileServiceImpl implements FileService {
 
 	@Override
 	public FileEntity saveFileData(String fileName, byte[] fileData, String contentType) throws IOException {
-		if(fileData == null || fileData.length == 0){
+		if (fileData == null || fileData.length == 0) {
 			throw new IllegalArgumentException("파일 데이터가 비어 있습니다.");
 		}
 		FileHandler fileHandler = fileHandlerFactory.getFileHandler(fileName);

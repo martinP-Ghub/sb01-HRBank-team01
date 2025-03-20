@@ -15,7 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 public class DatabaseConnectionTest {
 
-	public static final String DATABASE_NAME = "hrbank";
+	private static final String DATABASE_NAME = "hrbank";
 	@Autowired
 	private DataSource dataSource;
 

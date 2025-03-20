@@ -13,14 +13,14 @@ import com.project.hrbank.entity.EmployeeLogs;
 
 @Repository
 public interface EmployeeLogRepository extends JpaRepository<EmployeeLogs, Long> {
-	boolean existsByChangedAtAfter(LocalDateTime lastBackupEndedAt);
+	boolean existsByChangedAtAfter(LocalDateTime changedAt);
 
 	@Query("SELECT e FROM EmployeeLogs e " +
 		"WHERE (COALESCE(:cursor, e.changedAt) = e.changedAt OR e.changedAt < :cursor) " +
 		"AND (COALESCE(:atFrom, e.changedAt) = e.changedAt OR COALESCE(:atTo, e.changedAt) = e.changedAt OR e.changedAt BETWEEN :atFrom AND :atTo) "
 		+
 		"AND (:employeeNumber IS NULL OR e.employeeNumber LIKE CONCAT('%', :employeeNumber, '%')) " +
-		"AND (:memo IS NULL OR e.memo LIKE CONCAT('%', :memo, '%')) " +
+		"AND (:memo IS NULL OR e.memo IS NULL OR e.memo LIKE CONCAT('%', :memo, '%')) " +
 		"AND (:ipAddress IS NULL OR e.ipAddress LIKE CONCAT('%', :ipAddress, '%')) " +
 		"AND (:type IS NULL OR e.type LIKE CONCAT('%', :type, '%'))")
 	Slice<EmployeeLogs> findAll(
