@@ -110,6 +110,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 	//@Transactional 사용위치 확인 후 수정 클래스? 메서드? // 코드 컨벤션 지켜서 작성하기
 	@Override
+	@Transactional
 	public EmployeeResponseDto updateEmployee(Long id, EmployeeRequestDto dto, MultipartFile profileImage) {
 		Employee existingEmployee = employeeRepository.findById(id)
 			.orElseThrow(() -> new IllegalArgumentException("직원을 찾을 수 없습니다."));
