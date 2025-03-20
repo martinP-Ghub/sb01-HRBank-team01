@@ -43,7 +43,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	private static final Logger logger = LoggerFactory.getLogger(EmployeeServiceImpl.class);
 
 	@Override
-	public EmployeeResponseDto registerEmployee(EmployeeRequestDto requestDto) {
+	public EmployeeResponseDto registerEmployee(EmployeeRequestDto requestDto, MultipartFile profileImage) {
 		if (employeeRepository.existsByEmail(requestDto.getEmail())) {
 			throw new IllegalArgumentException("중복된 이메일입니다.");
 		}
@@ -58,8 +58,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 			.hireDate(requestDto.getHireDate())
 			.status(EmployeeStatus.ACTIVE)
 			.build();
-		Employee savedEmployee = employeeRepository.save(employee);
 
+		if (profileImage != null && !profileImage.isEmpty()) {
+			Long profileImageId = saveProfileImage(profileImage);
+			employee.setProfileImageId(profileImageId);
+		}
+
+		Employee savedEmployee = employeeRepository.save(employee);
 
 		List<Map<String, Object>> logData = new ArrayList<>();
 		logData.add(createLogEntry("employee_number", null, savedEmployee.getEmployeeNumber()));
@@ -69,6 +74,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 		logData.add(createLogEntry("department", null, String.valueOf(employee.getDepartmentId())));
 		logData.add(createLogEntry("email", null, employee.getEmail()));
 		logData.add(createLogEntry("status", null, employee.getStatus().toString()));
+		if (employee.getProfileImageId() != null) {
+			logData.add(createLogEntry("profile_image", null, String.valueOf(employee.getProfileImageId())));
+		}
 
 		saveLog("CREATED", logData, savedEmployee.getEmployeeNumber());
 
@@ -100,8 +108,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public long countActiveEmployees() {
 		return employeeRepository.countByStatus(EmployeeStatus.ACTIVE);
 	}
-
-	@Override//@Transactional 사용위치 확인 후 수정 클래스? 메서드? // 코드 컨벤션 지켜서 작성하기
+	//@Transactional 사용위치 확인 후 수정 클래스? 메서드? // 코드 컨벤션 지켜서 작성하기
+	@Override
 	public EmployeeResponseDto updateEmployee(Long id, EmployeeRequestDto dto, MultipartFile profileImage) {
 		Employee existingEmployee = employeeRepository.findById(id)
 			.orElseThrow(() -> new IllegalArgumentException("직원을 찾을 수 없습니다."));
