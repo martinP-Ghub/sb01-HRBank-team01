@@ -1,14 +1,13 @@
 package com.project.hrbank.backup.service;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,13 +15,9 @@ import com.project.hrbank.backup.domain.Backup;
 import com.project.hrbank.backup.domain.Status;
 import com.project.hrbank.backup.dto.response.BackupDto;
 import com.project.hrbank.backup.dto.response.CursorPageResponseBackupDto;
-import com.project.hrbank.backup.provider.CsvProvider;
+import com.project.hrbank.backup.provider.EmployeesLogCsvFileProvider;
 import com.project.hrbank.backup.repository.BackupRepository;
-import com.project.hrbank.backup.repository.BackupRepositoryImpl;
 import com.project.hrbank.file.entity.FileEntity;
-import com.project.hrbank.file.repository.FileRepository;
-import com.project.hrbank.file.service.FileService;
-import com.project.hrbank.file.storage.FileStorage;
 import com.project.hrbank.repository.EmployeeLogRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -31,41 +26,40 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BackupService {
-	private static final LocalDateTime POSTGRESQL_MIN_TIMESTAMP = LocalDateTime.of(4713, 11, 24, 0, 0);
-	public static final String SYSTEM_NAME = "SYSTEM";
-	public static final String CSV_CONTENT_TYPE = ".csv";
+	private static final Instant POSTGRESQL_MIN_TIMESTAMP = LocalDateTime.of(4713, 11, 24, 0, 0).toInstant(ZoneOffset.UTC);
+	private static final String SYSTEM_NAME = "SYSTEM";
 
 	private final BackupRepository backupRepository;
 	private final EmployeeLogRepository employeeLogRepository;
-	private final FileService fileService;
+	private final EmployeesLogCsvFileProvider csvProvider;
 
-	private final FileRepository fileRepository;
-	private final FileStorage fileStorage;
+	public CursorPageResponseBackupDto findAll(
+		Instant cursor,
+		Status status,
+		Instant startedAtFrom,
+		Instant startedAtTo,
+		Pageable pageable
+	) {
 
-	private final BackupRepositoryImpl backupRepositoryImpl;
-	private final CsvProvider csvProvider;
+		Page<Backup> page = backupRepository.findAllBy(cursor, status, startedAtFrom, startedAtTo, pageable);
 
-	public CursorPageResponseBackupDto findAll(LocalDateTime cursor, Pageable pageable) {
-		cursor = Optional.ofNullable(cursor).orElse(LocalDateTime.now());
-		Slice<Backup> slice = backupRepository.findAllBy(cursor, pageable);
+		List<BackupDto> content = getBackupContents(page);
 
-		List<BackupDto> content = getBackupContents(slice);
-
-		LocalDateTime nextCursor = null;
-		if (slice.hasContent()) {
-			nextCursor = slice.getContent().get(slice.getContent().size() - 1).getCreatedAt();
+		Instant nextCursor = null;
+		if (page.hasContent()) {
+			nextCursor = content.get(content.size() - 1).startedAt();
 		}
 
 		Long nextIdAfter = null;
-		if (slice.hasNext()) {
+		if (page.hasNext() && page.hasContent()) {
 			nextIdAfter = content.get(content.size() - 1).id();
 		}
-
-		long count = backupRepository.count();
-		return new CursorPageResponseBackupDto(content, nextCursor, nextIdAfter, content.size(), slice.hasNext(), count);
+		// TODO Type 변경 시 수정하기
+		// new CursorPageResponse<BackupDto>(content, nextCursor, nextIdAfter, content.size(), page.hasNext(), page.getTotalElements())
+		return new CursorPageResponseBackupDto(content, nextCursor, nextIdAfter, content.size(), page.hasNext(), page.getTotalElements());
 	}
 
-	private List<BackupDto> getBackupContents(Slice<Backup> slice) {
+	private List<BackupDto> getBackupContents(Page<Backup> slice) {
 		return slice.getContent()
 			.stream()
 			.map(this::toDto)
@@ -81,27 +75,13 @@ public class BackupService {
 
 		Backup backup = generateBackup(clientIpAddr);
 
-		LocalDateTime lastEndedAtBackupDateTime = getLastEndedAt();
+		Instant lastEndedAtBackupDateTime = getLastEndedAt();
 		if (isNotChangedEmployeeInfo(lastEndedAtBackupDateTime)) {
 			backup.updateSkipped();
 			return toDto(backupRepository.save(backup));
 		}
 
-		// 백업 파일 생성
-		// 1 fileId = backupId(다음으로 생성될 ID 디비에서 가져오기), fileName, createAt (파일을 생성 필요 데이터)
-
-		// 2 생성된 파일에 Employees 정보를 적재
-
-		// 3. 성공
-
-		// 4. 실패
-
-		// 마지막 엔티티 저장 fileId, fileName, fileContent, fileSize, filePath (엔티티 저장 필요 데이터)
-		// -> FileEntity 생성 한 후 저장했던 Backup 엔티티에 업데이트 해주면 될듯
-		//    backup 엔티티 처리 상태 업데이트
-
-		// 로그 파일에 데이터 쓰기
-		// backup 엔티티 처리 상태 업데이트
+		generateBackupFile(backup);
 
 		return toDto(backup);
 	}
@@ -112,24 +92,24 @@ public class BackupService {
 		return backup;
 	}
 
-	private LocalDateTime getLastEndedAt() {
+	private Instant getLastEndedAt() {
 		return backupRepository.findLastBackup().stream()
 			.findFirst()
 			.map(Backup::getEndedAt)
 			.orElse(POSTGRESQL_MIN_TIMESTAMP);
 	}
 
-	private boolean isNotChangedEmployeeInfo(LocalDateTime endedAt) {
-		return !employeeLogRepository.existsByChangedAtAfter(endedAt);
+	private boolean isNotChangedEmployeeInfo(Instant endedAt) {
+		return !employeeLogRepository.existsByChangedAtAfter(LocalDateTime.ofInstant(endedAt, ZoneOffset.UTC));
 	}
 
-	private FileEntity generateBackupFile() {
-		String fileName = csvProvider.generateFileName();
-		byte[] employeeData = csvProvider.loadEmployeeData();
-		Path path = Paths.get("system.user", "files");
-		Long length = (long)employeeData.length;
-		FileEntity fileEntity = new FileEntity(null, fileName, "csv", length, path.toString());
-		return fileStorage.saveFile(fileEntity.getId(), employeeData, fileName, CSV_CONTENT_TYPE);
+	private void generateBackupFile(Backup backup) {
+		try {
+			FileEntity fileEntity = csvProvider.saveEmployeeLogFile(backup.getId());
+			backup.updateCompleted(fileEntity);
+		} catch (RuntimeException exception) {
+			backup.updateFailed();
+		}
 	}
 
 	public BackupDto findLatest() {
@@ -148,32 +128,4 @@ public class BackupService {
 		return BackupDto.toDto(backup);
 	}
 
-	public CursorPageResponseBackupDto findWithSearchCondition(
-		LocalDateTime cursor,
-		Status status,
-		LocalDateTime startDate,
-		LocalDateTime endDate,
-		Pageable pageable
-	) {
-		cursor = Optional.ofNullable(cursor)
-			.orElse(LocalDateTime.now());
-		Slice<Backup> slice = backupRepositoryImpl.findWithSearchCondition(cursor, status, startDate, endDate,
-			pageable);
-
-		List<BackupDto> content = getBackupContents(slice);
-
-		LocalDateTime nextCursor = null;
-		if (!slice.getContent().isEmpty()) {
-			nextCursor = slice.getContent().get(slice.getContent().size() - 1).getCreatedAt();
-		}
-
-		Long nextIdAfter = null;
-		if (slice.hasNext()) {
-			nextIdAfter = content.get(content.size() - 1).id();
-		}
-
-		long count = backupRepository.countBackups(status);
-		return new CursorPageResponseBackupDto(content, nextCursor, nextIdAfter, content.size(), slice.hasNext(),
-			count);
-	}
 }

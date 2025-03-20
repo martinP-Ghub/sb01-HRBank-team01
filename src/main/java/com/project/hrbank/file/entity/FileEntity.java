@@ -1,8 +1,6 @@
 package com.project.hrbank.file.entity;
 
-import java.time.LocalDateTime;
-
-import org.hibernate.annotations.CreationTimestamp;
+import com.project.hrbank.entity.base.BaseTimeEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -18,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "files")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FileEntity {
+public class FileEntity extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,17 +35,19 @@ public class FileEntity {
 	@Column(name = "file_path", nullable = false)
 	private String filePath;
 
-	@CreationTimestamp
-	@Column(name = "created_at", nullable = false, updatable = false)
-	private LocalDateTime createdAt;
-
 	public FileEntity(Long id, String fileName, String contentType, Long size, String filePath) {
 		this.id = id;
 		this.fileName = fileName;
 		this.contentType = contentType;
 		this.size = size;
 		this.filePath = filePath;
-		this.createdAt = LocalDateTime.now();
+	}
+
+	public FileEntity(String fileName, String contentType, Long size, String filePath) {
+		this.fileName = fileName;
+		this.contentType = contentType;
+		this.size = size;
+		this.filePath = filePath;
 	}
 
 }
