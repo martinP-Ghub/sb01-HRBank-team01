@@ -1,10 +1,9 @@
 package com.project.hrbank.backup.service;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BackupService {
-	private static final Instant POSTGRESQL_MIN_TIMESTAMP = LocalDateTime.of(4713, 11, 24, 0, 0).toInstant(ZoneOffset.UTC);
+	private static final LocalDateTime POSTGRESQL_MIN_TIMESTAMP = LocalDateTime.of(1, 1, 1, 0, 0);
 	private static final String SYSTEM_NAME = "SYSTEM";
 
 	private final BackupRepository backupRepository;
@@ -34,18 +33,21 @@ public class BackupService {
 	private final EmployeesLogCsvFileProvider csvProvider;
 
 	public CursorPageResponseBackupDto findAll(
-		Instant cursor,
+		LocalDateTime cursor,
 		Status status,
-		Instant startedAtFrom,
-		Instant startedAtTo,
+		LocalDateTime startedAtFrom,
+		LocalDateTime startedAtTo,
 		Pageable pageable
 	) {
+		cursor = Optional.ofNullable(cursor).orElse(LocalDateTime.now());
+		startedAtFrom = Optional.ofNullable(startedAtFrom).orElse(LocalDateTime.of(2000, 1, 1, 0, 0));
+		startedAtTo = Optional.ofNullable(startedAtTo).orElse(LocalDateTime.now());
 
 		Page<Backup> page = backupRepository.findAllBy(cursor, status, startedAtFrom, startedAtTo, pageable);
 
 		List<BackupDto> content = getBackupContents(page);
 
-		Instant nextCursor = null;
+		LocalDateTime nextCursor = null;
 		if (page.hasContent()) {
 			nextCursor = content.get(content.size() - 1).startedAt();
 		}
@@ -54,8 +56,7 @@ public class BackupService {
 		if (page.hasNext() && page.hasContent()) {
 			nextIdAfter = content.get(content.size() - 1).id();
 		}
-		// TODO Type 변경 시 수정하기
-		// new CursorPageResponse<BackupDto>(content, nextCursor, nextIdAfter, content.size(), page.hasNext(), page.getTotalElements())
+
 		return new CursorPageResponseBackupDto(content, nextCursor, nextIdAfter, content.size(), page.hasNext(), page.getTotalElements());
 	}
 
@@ -66,6 +67,7 @@ public class BackupService {
 			.toList();
 	}
 
+	@Transactional
 	public void backupBySystem() {
 		backup(SYSTEM_NAME);
 	}
@@ -75,32 +77,31 @@ public class BackupService {
 
 		Backup backup = generateBackup(clientIpAddr);
 
-		Instant lastEndedAtBackupDateTime = getLastEndedAt();
+		LocalDateTime lastEndedAtBackupDateTime = getLastEndedAt();
 		if (isNotChangedEmployeeInfo(lastEndedAtBackupDateTime)) {
 			backup.updateSkipped();
 			return toDto(backupRepository.save(backup));
 		}
 
 		generateBackupFile(backup);
-
+		backupRepository.save(backup);
 		return toDto(backup);
 	}
 
 	private Backup generateBackup(String clientIpAddr) {
-		Backup backup = Backup.ofInProgress(clientIpAddr);
-		backupRepository.save(backup);
-		return backup;
+		return Backup.ofInProgress(clientIpAddr);
 	}
 
-	private Instant getLastEndedAt() {
+	private LocalDateTime getLastEndedAt() {
+
 		return backupRepository.findLastBackup().stream()
 			.findFirst()
 			.map(Backup::getEndedAt)
 			.orElse(POSTGRESQL_MIN_TIMESTAMP);
 	}
 
-	private boolean isNotChangedEmployeeInfo(Instant endedAt) {
-		return !employeeLogRepository.existsByChangedAtAfter(LocalDateTime.ofInstant(endedAt, ZoneOffset.UTC));
+	private boolean isNotChangedEmployeeInfo(LocalDateTime endedAt) {
+		return !employeeLogRepository.existsByChangedAtAfter(endedAt);
 	}
 
 	private void generateBackupFile(Backup backup) {

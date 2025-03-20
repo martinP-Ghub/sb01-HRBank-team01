@@ -1,6 +1,6 @@
 package com.project.hrbank.backup.domain;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import com.project.hrbank.entity.base.BaseTimeEntity;
@@ -37,10 +37,10 @@ public class Backup extends BaseTimeEntity {
 	private String worker;
 
 	@Column(name = "started_at", nullable = false)
-	private Instant startedAt;
+	private LocalDateTime startedAt;
 
 	@Column(name = "ended_at")
-	private Instant endedAt;
+	private LocalDateTime endedAt;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false)
@@ -50,7 +50,7 @@ public class Backup extends BaseTimeEntity {
 	@JoinColumn(name = "file_id")
 	FileEntity file;
 
-	public Backup(String worker, Status status, Instant startedAt, Instant endedAt) {
+	public Backup(String worker, Status status, LocalDateTime startedAt, LocalDateTime endedAt) {
 		this.worker = worker;
 		this.status = status;
 		this.startedAt = startedAt;
@@ -59,21 +59,21 @@ public class Backup extends BaseTimeEntity {
 
 	public static Backup ofInProgress(String clientIpAddr) {
 		Status status = Status.IN_PROGRESS;
-		return new Backup(clientIpAddr, status, Instant.now(), null);
+		return new Backup(clientIpAddr, status, LocalDateTime.now(), null);
 	}
 
 	public void updateSkipped() {
-		this.endedAt = Instant.now();
+		this.endedAt = LocalDateTime.now();
 		this.status = Status.SKIPPED;
 	}
 
 	public void updateFailed() {
-		this.endedAt = Instant.now();
+		this.endedAt = LocalDateTime.now();
 		this.status = Status.FAILED;
 	}
 
 	public void updateCompleted(FileEntity file) {
-		this.endedAt = Instant.now();
+		this.endedAt = LocalDateTime.now();
 		this.status = Status.COMPLETED;
 		this.file = file;
 	}
