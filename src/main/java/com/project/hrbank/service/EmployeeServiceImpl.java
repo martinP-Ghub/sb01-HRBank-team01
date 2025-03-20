@@ -15,9 +15,7 @@ import com.project.hrbank.dto.DepartmentDto;
 import com.project.hrbank.dto.request.EmployeeRequestDto;
 import com.project.hrbank.dto.response.EmployeeResponseDto;
 import com.project.hrbank.entity.Employee;
-import com.project.hrbank.entity.EmployeeLogs;
 import com.project.hrbank.entity.EmployeeStatus;
-import com.project.hrbank.repository.EmployeeLogRepository;
 import com.project.hrbank.repository.EmployeeRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -108,8 +106,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	@Override
-	public long countActiveEmployees() {
-		return employeeRepository.countByStatus(EmployeeStatus.ACTIVE);
+	public long countEmployeesHiredInDateRange(LocalDate fromDate, LocalDate toDate) {
+		return employeeRepository.countByHireDateBetween(fromDate, toDate);
 	}
 
 	//@Transactional 사용위치 확인 후 수정 클래스? 메서드? // 코드 컨벤션 지켜서 작성하기
@@ -250,11 +248,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 			logger.info("로그 출력: {}", jsonString);
 
 			String sql = """
-            INSERT INTO employee_change_logs 
-                (type, changed_value, ip, employee_number, changed_at, memo)
-            VALUES 
-                (?, ?::jsonb, ?, ?, ?, ?)
-            """;
+				INSERT INTO employee_change_logs 
+				    (type, changed_value, ip, employee_number, changed_at, memo)
+				VALUES 
+				    (?, ?::jsonb, ?, ?, ?, ?)
+				""";
 
 			jdbcTemplate.update(
 				sql,

@@ -1,5 +1,7 @@
 package com.project.hrbank.controller;
 
+import java.time.LocalDate;
+
 import com.project.hrbank.dto.request.EmployeeRequestDto;
 import com.project.hrbank.dto.response.EmployeeResponseDto;
 import com.project.hrbank.entity.EmployeeStatus;
@@ -8,6 +10,7 @@ import com.project.hrbank.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -73,11 +76,22 @@ public class EmployeeController {
 	@GetMapping("/count")
 	public ResponseEntity<Long> countEmployees(
 		@RequestParam(required = false) EmployeeStatus status,
-		@RequestParam(required = false) String fromDate,
-		@RequestParam(required = false) String toDate
+		@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) String fromDate,
+		@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) String toDate
 	) {
-		long count = employeeService.countEmployees(status, fromDate, toDate);
-		return ResponseEntity.ok(count);
+		if (fromDate != null && toDate != null) {
+			LocalDate start = LocalDate.parse(fromDate);
+			LocalDate end = LocalDate.parse(toDate);
+			long count = employeeService.countEmployeesHiredInDateRange(start, end);
+			return ResponseEntity.ok(count);
+		} else {
+			long count = employeeService.countEmployees(
+				status,
+				fromDate,
+				toDate
+			);
+			return ResponseEntity.ok(count);
+		}
 	}
 
 	@GetMapping("/stats/trend")
