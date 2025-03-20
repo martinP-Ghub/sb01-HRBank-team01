@@ -1,11 +1,11 @@
 package com.project.hrbank.backup.controller;
 
-import java.time.Instant;
-import java.util.Optional;
+import java.time.LocalDateTime;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,10 +30,10 @@ public class BackupController {
 
 	@GetMapping
 	public ResponseEntity<CursorPageResponseBackupDto> findAll(
-		@RequestParam(required = false) Instant cursor,
+		@RequestParam(required = false) LocalDateTime cursor,
 		@RequestParam(required = false) Status status,
-		@RequestParam(required = false, name = "startedAtFrom") Instant startedAtFrom,
-		@RequestParam(required = false, name = "startedAtTo") Instant startedAtTo,
+		@RequestParam(required = false, name = "startedAtFrom") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startedAtFrom,
+		@RequestParam(required = false, name = "startedAtTo") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startedAtTo,
 		@PageableDefault(
 			size = 30,
 			page = 0,
@@ -41,9 +41,7 @@ public class BackupController {
 			direction = Sort.Direction.DESC
 		) Pageable pageable
 	) {
-		cursor = Optional.ofNullable(cursor).orElse(Instant.now());
-		startedAtFrom = Optional.ofNullable(startedAtFrom).orElse(Instant.EPOCH);
-		startedAtTo = Optional.ofNullable(startedAtTo).orElse(Instant.now());
+
 		CursorPageResponseBackupDto backupDto = backupService.findAll(cursor, status, startedAtFrom, startedAtTo, pageable);
 		return ResponseEntity.ok().body(backupDto);
 	}
@@ -55,7 +53,6 @@ public class BackupController {
 		return ResponseEntity.ok().body(backup);
 	}
 
-	// DASH BOARD 에서 사용
 	@GetMapping("/latest")
 	public ResponseEntity<BackupDto> findLatest() {
 		BackupDto backupDto = backupService.findLatest();
