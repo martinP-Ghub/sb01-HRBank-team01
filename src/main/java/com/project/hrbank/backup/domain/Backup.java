@@ -57,11 +57,6 @@ public class Backup extends BaseTimeEntity {
 		this.endedAt = endedAt;
 	}
 
-	public static Backup ofSystem() {
-		Status status = Status.COMPLETED;
-		return new Backup("system", status, Instant.now(), Instant.now());
-	}
-
 	public static Backup ofInProgress(String clientIpAddr) {
 		Status status = Status.IN_PROGRESS;
 		return new Backup(clientIpAddr, status, Instant.now(), null);
