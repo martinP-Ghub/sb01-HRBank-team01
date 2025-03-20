@@ -8,10 +8,13 @@ import com.project.hrbank.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/employees")
@@ -19,6 +22,15 @@ import org.springframework.web.multipart.MultipartFile;
 public class EmployeeController {
 
 	private final EmployeeService employeeService;
+
+	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<EmployeeResponseDto> registerEmployee(
+		@RequestPart(value = "employee", required = true) @Valid EmployeeRequestDto requestDto,
+		@RequestPart(value = "profile", required = false) MultipartFile profileImage
+	) {
+		EmployeeResponseDto responseDto = employeeService.registerEmployee(requestDto, profileImage);
+		return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+	}
 
 	@GetMapping
 	public ResponseEntity<Page<EmployeeResponseDto>> getEmployees(
