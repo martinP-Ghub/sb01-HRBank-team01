@@ -27,3 +27,7 @@ logging:
 
 schedule:
   backup-cron: "0 0 0/1 * * *"
+
+hrBank:
+  repository:
+    file-directory: files

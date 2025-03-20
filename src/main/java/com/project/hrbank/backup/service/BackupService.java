@@ -16,7 +16,6 @@ import com.project.hrbank.backup.dto.response.BackupDto;
 import com.project.hrbank.backup.dto.response.CursorPageResponseBackupDto;
 import com.project.hrbank.backup.provider.EmployeesLogCsvFileProvider;
 import com.project.hrbank.backup.repository.BackupRepository;
-import com.project.hrbank.file.entity.FileEntity;
 import com.project.hrbank.repository.EmployeeLogRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -40,7 +39,7 @@ public class BackupService {
 		Pageable pageable
 	) {
 		cursor = Optional.ofNullable(cursor).orElse(LocalDateTime.now());
-		startedAtFrom = Optional.ofNullable(startedAtFrom).orElse(LocalDateTime.of(2000, 1, 1, 0, 0));
+		startedAtFrom = Optional.ofNullable(startedAtFrom).orElse(POSTGRESQL_MIN_TIMESTAMP);
 		startedAtTo = Optional.ofNullable(startedAtTo).orElse(LocalDateTime.now());
 
 		Page<Backup> page = backupRepository.findAllBy(cursor, status, startedAtFrom, startedAtTo, pageable);
@@ -105,12 +104,11 @@ public class BackupService {
 	}
 
 	private void generateBackupFile(Backup backup) {
-		try {
-			FileEntity fileEntity = csvProvider.saveEmployeeLogFile(backup.getId());
-			backup.updateCompleted(fileEntity);
-		} catch (RuntimeException exception) {
-			backup.updateFailed();
-		}
+		csvProvider.saveEmployeeLogFile(backup.getId())
+			.ifPresentOrElse(
+				backup::updateCompleted,
+				backup::updateFailed
+			);
 	}
 
 	public BackupDto findLatest() {
