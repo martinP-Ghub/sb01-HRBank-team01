@@ -205,7 +205,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 			employee.getStatus() != null ? employee.getStatus().toString() : null,
 			null));
 
-		saveLog("DELETED", logData, employee.getEmployeeNumber(), null);
+		saveLog("DELETED", logData, employee.getEmployeeNumber(), "직원 삭제");
 		employeeRepository.deleteById(id);
 	}
 
