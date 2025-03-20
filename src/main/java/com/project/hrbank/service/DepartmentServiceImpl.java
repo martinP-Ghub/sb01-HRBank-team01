@@ -1,8 +1,7 @@
 package com.project.hrbank.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,9 +25,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 		}
 
 		Department department = new Department();
-		department.setName(dto.name());
-		department.setDescription(dto.description());
-		department.setEstablishedDate(dto.establishedDate());
+		department.update(dto.name(), dto.description(), dto.establishedDate());
+
 		departmentRepository.save(department);
 
 		return new DepartmentDto(
@@ -43,18 +41,26 @@ public class DepartmentServiceImpl implements DepartmentService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<DepartmentDto> getAllDepartments() {
-		return departmentRepository.findAll()
-			.stream()
-			.map(department -> new DepartmentDto(
-				department.getId(),
-				department.getName(),
-				department.getDescription(),
-				department.getEstablishedDate(),
-				getEmployeeCount(department.getId()),
-				department.getCreatedAt()
-			))
-			.collect(Collectors.toList());
+	public DepartmentDto getDepartmentById(Long id) {
+		Department department = departmentRepository.findById(id)
+			.orElseThrow(() -> new IllegalArgumentException("Department not found with id: " + id));
+
+		return new DepartmentDto(
+			department.getId(),
+			department.getName(),
+			department.getDescription(),
+			department.getEstablishedDate(),
+			getEmployeeCount(department.getId()),
+			department.getCreatedAt()
+		);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Page<DepartmentDto> getAllDepartments(Pageable pageable) {
+		return departmentRepository.findAll(pageable)
+			.map(department -> new DepartmentDto(department.getId(), department.getName(), department.getDescription(),
+				department.getEstablishedDate(), getEmployeeCount(department.getId()), department.getCreatedAt()));
 	}
 
 	@Override
@@ -67,10 +73,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 			throw new IllegalArgumentException("Department name already exists");
 		}
 
-		department.setName(dto.name());
-		department.setDescription(dto.description());
-		department.setEstablishedDate(dto.establishedDate());
-		departmentRepository.save(department);
+		department.update(dto.name(), dto.description(), dto.establishedDate());
 
 		return new DepartmentDto(
 			department.getId(),
