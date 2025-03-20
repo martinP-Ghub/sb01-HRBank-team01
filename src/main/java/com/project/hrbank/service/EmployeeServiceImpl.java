@@ -137,9 +137,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 			logData.add(createLogEntry("position", existingEmployee.getPosition(), dto.getPosition()));
 			existingEmployee.setPosition(dto.getPosition());
 		}
-		if (dto.getMemo() != null && !dto.getMemo().isEmpty()) {
-			logData.add(createLogEntry("memo", null, dto.getMemo()));
-		}
+
 		if (!Objects.equals(existingEmployee.getDepartmentId(), dto.getDepartmentId())) {
 			logData.add(createLogEntry("department",
 				existingEmployee.getDepartmentId() != null ? String.valueOf(existingEmployee.getDepartmentId()) : null,
@@ -252,11 +250,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 			logger.info("로그 출력: {}", jsonString);
 
 			String sql = """
-				INSERT INTO employee_change_logs 
-				    (type, changed_value, ip, employee_number, changed_at, memo)
-				VALUES 
-				    (?, ?::jsonb, ?, ?, ?, ?)
-				""";
+            INSERT INTO employee_change_logs 
+                (type, changed_value, ip, employee_number, changed_at, memo)
+            VALUES 
+                (?, ?::jsonb, ?, ?, ?, ?)
+            """;
 
 			jdbcTemplate.update(
 				sql,
