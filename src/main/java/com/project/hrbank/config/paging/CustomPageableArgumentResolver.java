@@ -13,7 +13,10 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 @Component
 public class CustomPageableArgumentResolver extends PageableHandlerMethodArgumentResolver {
 
+	public static final String PAGE = "page";
+	public static final String SIZE = "size";
 	public static final String SORT_FIELD_KEY = "sortField";
+	public static final String SORT_DIRECTION_KEY = "sortDirection";
 
 	@Override
 	public Pageable resolveArgument(
@@ -25,8 +28,8 @@ public class CustomPageableArgumentResolver extends PageableHandlerMethodArgumen
 
 		String sortFieldValue = getSortFieldValue(webRequest);
 		Sort.Direction sortDirectionValue = getSortDirectionValue(webRequest);
-		int pageValue = getIntegerOrDefault(webRequest.getParameter("page"), 0);
-		int sizeValue = getIntegerOrDefault(webRequest.getParameter("page"), 30);
+		int pageValue = getIntegerOrDefault(webRequest.getParameter(PAGE), 0);
+		int sizeValue = getIntegerOrDefault(webRequest.getParameter(SIZE), 30);
 
 		return PageRequest.of(pageValue, sizeValue, Sort.by(sortDirectionValue, sortFieldValue));
 	}
@@ -52,7 +55,7 @@ public class CustomPageableArgumentResolver extends PageableHandlerMethodArgumen
 	}
 
 	private Sort.Direction getSortDirectionValue(NativeWebRequest webRequest) {
-		String sortDirection = webRequest.getParameter("sortDirection");
+		String sortDirection = webRequest.getParameter(SORT_DIRECTION_KEY);
 		if (sortDirection == null || sortDirection.isBlank()) {
 			return Sort.Direction.DESC;
 		}
