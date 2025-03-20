@@ -2,8 +2,6 @@ package com.project.hrbank.file.storage;
 
 import java.io.InputStream;
 
-import org.springframework.http.ResponseEntity;
-
 import com.project.hrbank.file.dto.FileDto;
 import com.project.hrbank.file.entity.FileEntity;
 
@@ -27,11 +25,11 @@ public interface FileStorage {
 	InputStream get(Long id);
 
 	/**
-	 * 파일 다운로드 응답 생성
-	 * @param fileDto 다운로드할 파일의 메타 데이터
-	 * @return 다운로드 ResponseEntity
+	 *
+	 * @param id 가져올 file id
+	 * @return file InputStream 으로 가져오기
 	 */
-	ResponseEntity<?> download(FileDto fileDto);
+	InputStream getFileStream(Long id);
 
 	/**
 	 * 파일 삭제
