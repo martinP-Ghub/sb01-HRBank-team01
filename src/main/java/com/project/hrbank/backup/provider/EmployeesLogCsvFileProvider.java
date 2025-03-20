@@ -76,7 +76,7 @@ public class EmployeesLogCsvFileProvider {
 
 				page++;
 			} while (employeePage.hasNext());
-			
+
 			long fileSize = Files.size(employeesLogFilePath);
 			FileEntity fileEntity = new FileEntity(fileName, FileExtension.CSV.getDescription(), fileSize, employeesLogFilePath.getParent().toString());
 			return Optional.of(fileEntity);
