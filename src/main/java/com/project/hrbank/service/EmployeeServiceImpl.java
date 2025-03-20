@@ -11,6 +11,7 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.hrbank.dto.DepartmentDto;
 import com.project.hrbank.dto.request.EmployeeRequestDto;
 import com.project.hrbank.dto.response.EmployeeResponseDto;
 import com.project.hrbank.entity.Employee;
@@ -39,7 +40,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	private final JdbcTemplate jdbcTemplate;
 
 	private final EmployeeRepository employeeRepository;
-	private final EmployeeLogRepository employeeLogRepository;
+	private final DepartmentService departmentService;
 	private static final Logger logger = LoggerFactory.getLogger(EmployeeServiceImpl.class);
 
 	@Override
@@ -89,12 +90,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 		Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
 		Pageable pageable = PageRequest.of(page, size, sort);
 
-		return employeeRepository.findFilteredEmployees(
+		Page<Employee> employees = employeeRepository.findFilteredEmployees(
 			departmentName,
 			position,
 			status,
 			pageable
-		).map(this::convertToDto);
+		);
+
+		return employees.map(this::convertToDto);
 	}
 
 	@Override
@@ -279,12 +282,15 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	private EmployeeResponseDto convertToDto(Employee employee) {
+		DepartmentDto departmentDto = departmentService.getDepartmentById(employee.getDepartmentId());
+
 		return EmployeeResponseDto.builder()
 			.id(employee.getEmployeeId())
 			.name(employee.getName())
 			.email(employee.getEmail())
 			.employeeNumber(employee.getEmployeeNumber())
 			.departmentId(employee.getDepartmentId())
+			.departmentName(departmentDto.name())
 			.position(employee.getPosition())
 			.hireDate(employee.getHireDate())
 			.status(employee.getStatus())
