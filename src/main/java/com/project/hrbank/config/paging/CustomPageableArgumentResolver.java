@@ -25,7 +25,8 @@ public class CustomPageableArgumentResolver extends PageableHandlerMethodArgumen
 		NativeWebRequest webRequest,
 		WebDataBinderFactory binderFactory
 	) {
-
+		DefaultSortField methodAnnotation = methodParameter.getMethodAnnotation(DefaultSortField.class);
+		
 		String sortFieldValue = getSortFieldValue(webRequest);
 		Sort.Direction sortDirectionValue = getSortDirectionValue(webRequest);
 		int pageValue = getIntegerOrDefault(webRequest.getParameter(PAGE), 0);
