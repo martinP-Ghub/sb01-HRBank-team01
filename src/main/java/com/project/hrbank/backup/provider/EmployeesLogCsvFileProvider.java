@@ -36,7 +36,7 @@ public class EmployeesLogCsvFileProvider {
 
 		if (Files.notExists(DIRECTORY)) {
 			try {
-				Files.createDirectory(DIRECTORY);
+				Files.createDirectories(DIRECTORY);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
