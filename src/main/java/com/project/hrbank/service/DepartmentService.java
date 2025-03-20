@@ -12,7 +12,8 @@ public interface DepartmentService {
 
 	DepartmentDto getDepartmentById(Long id);
 
-	CursorPageResponse<DepartmentDto> getAllDepartments(LocalDateTime cursor, String search, Pageable pageable);
+	CursorPageResponse<DepartmentDto> getAllDepartments(LocalDateTime cursor, String nameOrDescription,
+		Pageable pageable);
 
 	DepartmentDto updateDepartment(Long id, DepartmentDto dto);
 

@@ -16,12 +16,11 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
 	boolean existsByName(String name);
 
 	@Query("SELECT d FROM Department d " +
-		"WHERE (COALESCE(:cursor, d.createdAt) = d.createdAt OR d.createdAt > :cursor) " +
-		"AND ((LOWER(d.name) = LOWER(COALESCE(:search, d.name)) OR LOWER(d.description) = LOWER(COALESCE(:search, d.description))) OR :search IS NULL) "
-		+
-		"ORDER BY d.createdAt, d.name")
+		"WHERE (COALESCE(:cursor, d.createdAt) = d.createdAt OR d.createdAt < :cursor) " +
+		"AND (:nameOrDescription IS NULL OR LOWER(d.name) LIKE LOWER(CONCAT('%', :nameOrDescription, '%')) OR LOWER(d.description) LIKE LOWER(CONCAT('%', :nameOrDescription, '%'))) ")
 	Slice<Department> findNextDepartments(
 		@Param("cursor") LocalDateTime cursor,
-		@Param("search") String search,
-		Pageable pageable);
+		@Param("nameOrDescription") String nameOrDescription,
+		Pageable pageable
+	);
 }

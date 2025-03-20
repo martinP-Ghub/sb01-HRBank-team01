@@ -3,7 +3,6 @@ package com.project.hrbank.service;
 import java.time.LocalDateTime;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,16 +62,8 @@ public class DepartmentServiceImpl implements DepartmentService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public CursorPageResponse<DepartmentDto> getAllDepartments(LocalDateTime cursor, String search, Pageable pageable) {
-		log.info("Fetching departments - Last Cursor: {}, Search: '{}', Page: {}, Size: {}",
-			cursor, search, pageable.getPageNumber(), pageable.getPageSize());
-
-		Slice<Department> results = departmentRepository.findNextDepartments(
-			cursor,
-			search,
-			pageable
-		);
-
+	public CursorPageResponse<DepartmentDto> getAllDepartments(LocalDateTime cursor, String nameOrDescription,
+		Pageable pageable) {
 		return cursorPaginationService.getPaginatedResults(
 			cursor,
 			pageable,
@@ -87,8 +78,11 @@ public class DepartmentServiceImpl implements DepartmentService {
 			),
 			Department::getCreatedAt,
 			Department::getId,
-			(lastCursor, p) -> departmentRepository.findNextDepartments(lastCursor, search, p)
-		);
+			(cur, page) -> departmentRepository.findNextDepartments(
+				cur,
+				nameOrDescription,
+				page
+			));
 	}
 
 	private String cleanSearchParam(String search) {

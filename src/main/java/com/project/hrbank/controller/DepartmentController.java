@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -52,20 +50,20 @@ public class DepartmentController {
 
 	@GetMapping
 	public ResponseEntity<CursorPageResponse<DepartmentDto>> getAllDepartments(
-		@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursor,
-		@RequestParam(required = false) String nameOrDescription,
-		@RequestParam(required = false) String sortField,
+		@RequestParam(required = false) LocalDateTime cursor,
+		@RequestParam(defaultValue = "") String nameOrDescription,
+		@RequestParam(defaultValue = "name") String sortField,
 		@RequestParam(defaultValue = "asc") String sortDirection,
-		@PageableDefault(size = 30, sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable) {
+		@RequestParam(defaultValue = "30") int size
+	) {
 
 		String searchQuery = nameOrDescription != null && !nameOrDescription.trim().isEmpty()
 			? nameOrDescription.trim()
-			: null;
+			: "";
 
-		if (sortField != null) {
-			Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
-			pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-		}
+		Sort.Direction direction = sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+		Sort sort = Sort.by(direction, sortField);
+		Pageable pageable = PageRequest.of(0, size, sort);
 
 		CursorPageResponse<DepartmentDto> departments = departmentService.getAllDepartments(cursor, searchQuery,
 			pageable);
