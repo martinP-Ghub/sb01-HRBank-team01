@@ -20,11 +20,18 @@ public class ImageFileHandler implements FileHandler {
 	}
 
 	@Override
-	public byte[] processFile(MultipartFile file) throws IOException {
+	public byte[] processMultipartFile(MultipartFile file) throws IOException {
 		Path filePath = Paths.get(IMAGE_STORAGE_PATH + file.getOriginalFilename());
 		Files.createDirectories(filePath.getParent());
-		Files.write(filePath, file.getBytes());
 		return file.getBytes();
+	}
+
+	@Override
+	public byte[] processFileData(String fileName, byte[] fileData) throws IOException {
+		Path filePath = Paths.get(IMAGE_STORAGE_PATH + fileName);
+		Files.createDirectories(filePath.getParent());
+		Files.write(filePath, fileData);
+		return fileData;
 	}
 
 	@Override
