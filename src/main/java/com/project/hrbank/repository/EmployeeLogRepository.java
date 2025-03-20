@@ -20,7 +20,7 @@ public interface EmployeeLogRepository extends JpaRepository<EmployeeLogs, Long>
 		"AND (COALESCE(:atFrom, e.changedAt) = e.changedAt OR COALESCE(:atTo, e.changedAt) = e.changedAt OR e.changedAt BETWEEN :atFrom AND :atTo) "
 		+
 		"AND (:employeeNumber IS NULL OR e.employeeNumber LIKE CONCAT('%', :employeeNumber, '%')) " +
-		"AND (:memo IS NULL OR e.memo LIKE CONCAT('%', :memo, '%')) " +
+		"AND (:memo IS NULL OR e.memo IS NULL OR e.memo LIKE CONCAT('%', :memo, '%')) " +
 		"AND (:ipAddress IS NULL OR e.ipAddress LIKE CONCAT('%', :ipAddress, '%')) " +
 		"AND (:type IS NULL OR e.type LIKE CONCAT('%', :type, '%'))")
 	Slice<EmployeeLogs> findAll(
