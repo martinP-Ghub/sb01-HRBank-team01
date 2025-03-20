@@ -13,12 +13,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "departments")
 @Getter
-@Setter
 @NoArgsConstructor
 public class Department {
 
@@ -39,6 +37,12 @@ public class Department {
 	@CreationTimestamp
 	@Column(nullable = false, updatable = false)
 	private LocalDateTime createdAt;
+
+	public void update(String name, String description, LocalDate establishedDate) {
+		this.name = name;
+		this.description = description;
+		this.establishedDate = establishedDate;
+	}
 }
 
 
