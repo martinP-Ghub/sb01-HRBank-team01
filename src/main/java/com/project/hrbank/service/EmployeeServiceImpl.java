@@ -11,6 +11,7 @@ import java.util.Objects;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.hrbank.dto.DepartmentDto;
 import com.project.hrbank.dto.request.EmployeeRequestDto;
 import com.project.hrbank.dto.response.EmployeeResponseDto;
 import com.project.hrbank.entity.Employee;
@@ -39,7 +40,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	private final JdbcTemplate jdbcTemplate;
 
 	private final EmployeeRepository employeeRepository;
-	private final EmployeeLogRepository employeeLogRepository;
+	private final DepartmentService departmentService;
 	private static final Logger logger = LoggerFactory.getLogger(EmployeeServiceImpl.class);
 
 	@Override
@@ -89,12 +90,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 		Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
 		Pageable pageable = PageRequest.of(page, size, sort);
 
-		return employeeRepository.findFilteredEmployees(
+		Page<Employee> employees = employeeRepository.findFilteredEmployees(
 			departmentName,
 			position,
 			status,
 			pageable
-		).map(this::convertToDto);
+		);
+
+		return employees.map(this::convertToDto);
 	}
 
 	@Override
@@ -134,9 +137,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 			logData.add(createLogEntry("position", existingEmployee.getPosition(), dto.getPosition()));
 			existingEmployee.setPosition(dto.getPosition());
 		}
-		if (dto.getMemo() != null && !dto.getMemo().isEmpty()) {
-			logData.add(createLogEntry("memo", null, dto.getMemo()));
-		}
+
 		if (!Objects.equals(existingEmployee.getDepartmentId(), dto.getDepartmentId())) {
 			logData.add(createLogEntry("department",
 				existingEmployee.getDepartmentId() != null ? String.valueOf(existingEmployee.getDepartmentId()) : null,
@@ -249,11 +250,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 			logger.info("로그 출력: {}", jsonString);
 
 			String sql = """
-				INSERT INTO employee_change_logs 
-				    (type, changed_value, ip, employee_number, changed_at, memo)
-				VALUES 
-				    (?, ?::jsonb, ?, ?, ?, ?)
-				""";
+            INSERT INTO employee_change_logs 
+                (type, changed_value, ip, employee_number, changed_at, memo)
+            VALUES 
+                (?, ?::jsonb, ?, ?, ?, ?)
+            """;
 
 			jdbcTemplate.update(
 				sql,
@@ -279,12 +280,15 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	private EmployeeResponseDto convertToDto(Employee employee) {
+		DepartmentDto departmentDto = departmentService.getDepartmentById(employee.getDepartmentId());
+
 		return EmployeeResponseDto.builder()
 			.id(employee.getEmployeeId())
 			.name(employee.getName())
 			.email(employee.getEmail())
 			.employeeNumber(employee.getEmployeeNumber())
 			.departmentId(employee.getDepartmentId())
+			.departmentName(departmentDto.name())
 			.position(employee.getPosition())
 			.hireDate(employee.getHireDate())
 			.status(employee.getStatus())
