@@ -51,6 +51,7 @@ public class EmployeesLogCsvFileProvider {
 			BufferedWriter bufferedWriter = Files.newBufferedWriter(filePathName, StandardCharsets.UTF_8)
 		) {
 			bufferedWriter.write(CSV_HEADER_CONTENT);
+			bufferedWriter.newLine();
 
 			Page<Employee> employeePage;
 			do {
@@ -61,6 +62,7 @@ public class EmployeesLogCsvFileProvider {
 
 				for (Employee employee : employeePage.getContent()) {
 					bufferedWriter.write(writeEmployeeInfo(employee));
+					bufferedWriter.newLine();
 				}
 
 				page++;
