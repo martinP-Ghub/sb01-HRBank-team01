@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.hrbank.config.paging.DefaultSortField;
 import com.project.hrbank.dto.DepartmentDto;
 import com.project.hrbank.service.DepartmentService;
 
@@ -42,7 +43,7 @@ public class DepartmentController {
 	}
 
 	@GetMapping
-	public ResponseEntity<Page<DepartmentDto>> getAllDepartments(Pageable pageable) {
+	public ResponseEntity<Page<DepartmentDto>> getAllDepartments(@DefaultSortField("establishedDate") Pageable pageable) {
 		Page<DepartmentDto> departments = departmentService.getAllDepartments(pageable);
 		return ResponseEntity.ok(departments);
 	}
