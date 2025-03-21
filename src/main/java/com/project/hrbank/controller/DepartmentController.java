@@ -48,10 +48,11 @@ public class DepartmentController {
 	}
 
 	@GetMapping
+	@DefaultSortField("createdAt")
 	public ResponseEntity<CursorPageResponse<DepartmentDto>> getAllDepartments(
 		@RequestParam(required = false) LocalDateTime cursor,
 		@RequestParam(defaultValue = "") String nameOrDescription,
-		@DefaultSortField("createdAt") Pageable pageable) {
+		Pageable pageable) {
 		CursorPageResponse<DepartmentDto> response = departmentService.getAllDepartments(
 			cursor,
 			nameOrDescription,
