@@ -1,6 +1,6 @@
-package com.project.hrbank.file.dto;
+package com.project.hrbank.dto;
 
-import com.project.hrbank.file.entity.FileEntity;
+import com.project.hrbank.entity.FileEntity;
 
 public record FileDto(Long id, String fileName, String contentType, Long size) {
 

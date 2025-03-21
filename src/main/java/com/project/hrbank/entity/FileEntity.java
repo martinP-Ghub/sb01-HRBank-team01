@@ -1,4 +1,4 @@
-package com.project.hrbank.file.entity;
+package com.project.hrbank.entity;
 
 import com.project.hrbank.entity.base.BaseTimeEntity;
 

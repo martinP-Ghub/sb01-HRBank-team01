@@ -1,11 +1,11 @@
-package com.project.hrbank.file.handler;
+package com.project.hrbank.util.handler;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.project.hrbank.file.entity.FileEntity;
+import com.project.hrbank.entity.FileEntity;
 
 public interface FileHandler {
 
