@@ -2,11 +2,14 @@ spring:
   application:
     name: HRBank-team1
 
+  config:
+    import: optional:file:.env[.properties]
+
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/hrbank
-    username: hrbank_user
-    password: hrbank1234
+    url: ${DATABASE_URL}
+    username: ${POSTGRES_USER}
+    password: ${DATABASE_PASSWORD}
 
   jpa:
     hibernate:
