@@ -1,7 +1,9 @@
 package com.project.hrbank.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,27 +64,55 @@ public class DepartmentServiceImpl implements DepartmentService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public CursorPageResponse<DepartmentDto> getAllDepartments(LocalDateTime cursor, String nameOrDescription,
-		Pageable pageable) {
-		return cursorPaginationService.getPaginatedResults(
+	public CursorPageResponse<DepartmentDto> getAllDepartments(
+		LocalDateTime cursor,
+		String nameOrDescription,
+		Pageable pageable
+	) {
+		cursor = null;
+
+		String searchQuery = nameOrDescription.isBlank() ? "" : nameOrDescription.trim();
+
+		Page<Department> page = departmentRepository.findNextDepartments(
 			cursor,
-			pageable,
-			departmentRepository,
-			department -> new DepartmentDto(
+			searchQuery,
+			pageable
+		);
+
+		List<DepartmentDto> content = getDepartmentContents(page);
+
+		LocalDateTime nextCursor = null;
+		if (page.hasContent()) {
+			nextCursor = content.get(content.size() - 1).createdAt();
+		}
+
+		Long nextIdAfter = null;
+		if (page.hasNext() && page.hasContent()) {
+			nextIdAfter = content.get(content.size() - 1).id();
+		}
+
+		return new CursorPageResponse<>(
+			content,
+			nextCursor,
+			nextIdAfter,
+			content.size(),
+			page.hasNext(),
+			page.getTotalElements()
+		);
+	}
+
+	private List<DepartmentDto> getDepartmentContents(Page<Department> slice) {
+		return slice.getContent()
+			.stream()
+			.map(department -> new DepartmentDto(
 				department.getId(),
 				department.getName(),
 				department.getDescription(),
 				department.getEstablishedDate(),
 				getEmployeeCount(department.getId()),
 				department.getCreatedAt()
-			),
-			Department::getCreatedAt,
-			Department::getId,
-			(cur, page) -> departmentRepository.findNextDepartments(
-				cur,
-				nameOrDescription,
-				page
-			));
+			))
+			.toList();
 	}
 
 	@Override

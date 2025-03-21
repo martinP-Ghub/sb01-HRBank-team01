@@ -2,9 +2,7 @@ package com.project.hrbank.controller;
 
 import java.time.LocalDateTime;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.project.hrbank.config.paging.DefaultSortField;
 import com.project.hrbank.dto.DepartmentDto;
 import com.project.hrbank.dto.response.CursorPageResponse;
 import com.project.hrbank.service.DepartmentService;
@@ -31,8 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 public class DepartmentController {
 
 	private final DepartmentService departmentService;
-	private String lastSortField = null;
-	private String lastSortDirection = null;
 
 	@PostMapping
 	public ResponseEntity<DepartmentDto> createDepartment(@RequestBody DepartmentDto dto) {
@@ -54,25 +51,13 @@ public class DepartmentController {
 	public ResponseEntity<CursorPageResponse<DepartmentDto>> getAllDepartments(
 		@RequestParam(required = false) LocalDateTime cursor,
 		@RequestParam(defaultValue = "") String nameOrDescription,
-		@RequestParam(defaultValue = "name") String sortField,
-		@RequestParam(defaultValue = "asc") String sortDirection,
-		@RequestParam(defaultValue = "30") int size
-	) {
-		if (!sortField.equals(lastSortField) || !sortDirection.equals(lastSortDirection)) {
-			cursor = null;
-		}
-
-		String searchQuery = nameOrDescription != null && !nameOrDescription.trim().isEmpty()
-			? nameOrDescription.trim()
-			: "";
-
-		Sort.Direction direction = sortDirection.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
-		Sort sort = Sort.by(direction, sortField);
-		Pageable pageable = PageRequest.of(0, size, sort);
-
-		CursorPageResponse<DepartmentDto> departments = departmentService.getAllDepartments(cursor, searchQuery,
-			pageable);
-		return ResponseEntity.ok(departments);
+		@DefaultSortField("createdAt") Pageable pageable) {
+		CursorPageResponse<DepartmentDto> response = departmentService.getAllDepartments(
+			cursor,
+			nameOrDescription,
+			pageable
+		);
+		return ResponseEntity.ok(response);
 	}
 
 	@PatchMapping("/{id}")
