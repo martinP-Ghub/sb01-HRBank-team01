@@ -2,6 +2,7 @@ package com.project.hrbank.controller;
 
 import com.project.hrbank.dto.request.EmployeeRequestDto;
 import com.project.hrbank.dto.response.EmployeeResponseDto;
+import com.project.hrbank.file.service.FileService;
 import com.project.hrbank.service.EmployeeService;
 
 import lombok.RequiredArgsConstructor;
@@ -21,10 +22,14 @@ import jakarta.validation.Valid;
 public class EmployeeController {
 
 	private final EmployeeService employeeService;
+	private final FileService fileService;
 
-	@PostMapping
-	public ResponseEntity<EmployeeResponseDto> registerEmployee(@RequestBody @Valid EmployeeRequestDto requestDto) {
-		EmployeeResponseDto responseDto = employeeService.registerEmployee(requestDto);
+	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<EmployeeResponseDto> registerEmployee(
+		@RequestPart("employee") @Valid EmployeeRequestDto requestDto,
+		@RequestPart(value = "profile", required = false) MultipartFile profileImage
+	) {
+		EmployeeResponseDto responseDto = employeeService.registerEmployee(requestDto, profileImage);
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
 	}
 

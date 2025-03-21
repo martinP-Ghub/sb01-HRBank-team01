@@ -1,11 +1,14 @@
 package com.project.hrbank.service;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import com.project.hrbank.dto.request.EmployeeRequestDto;
 import com.project.hrbank.dto.response.EmployeeResponseDto;
 import com.project.hrbank.entity.Employee;
 import com.project.hrbank.entity.EmployeeStatus;
+import com.project.hrbank.file.entity.FileEntity;
+import com.project.hrbank.file.service.FileService;
 import com.project.hrbank.repository.EmployeeRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -23,9 +26,10 @@ import org.springframework.web.multipart.MultipartFile;
 public class EmployeeServiceImpl implements EmployeeService {
 
 	private final EmployeeRepository employeeRepository;
+	private final FileService fileService;
 
 	@Override
-	public EmployeeResponseDto registerEmployee(EmployeeRequestDto requestDto) {
+	public EmployeeResponseDto registerEmployee(EmployeeRequestDto requestDto, MultipartFile file) {
 		if (employeeRepository.existsByEmail(requestDto.getEmail())) {
 			throw new IllegalArgumentException("중복된 이메일입니다.");
 		}
@@ -40,6 +44,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 			.status(EmployeeStatus.ACTIVE)
 			.profileImageId(requestDto.getProfileImageId())
 			.build();
+
+		try {
+			FileEntity fileEntity = fileService.saveMultipartFile(file);
+			employee.setProfileImageId(fileEntity.getId());
+		}catch (IOException e) {
+			throw new RuntimeException(e.getMessage());
+		}
 
 		employeeRepository.save(employee);
 		return convertToDto(employee);
@@ -69,6 +80,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		return employeeRepository.countByStatus(EmployeeStatus.ACTIVE);
 	}
 
+	// 변경
 	@Override
 	@Transactional
 	public EmployeeResponseDto updateEmployee(Long id, EmployeeRequestDto dto, MultipartFile profileImage) {
@@ -124,9 +136,21 @@ public class EmployeeServiceImpl implements EmployeeService {
 		}
 	}
 
+	// 이부분 변경
 	@Override
 	public void deleteEmployee(Long id) {
-		employeeRepository.deleteById(id);
+		Optional<Employee> findEmployee = employeeRepository.findById(id);
+		findEmployee.ifPresent(employee -> {
+			Long profileImageId = employee.getProfileImageId();
+
+			// 프로필 이미지가 존재하면 삭제
+			if (profileImageId != null) {
+				fileService.deleteFile(profileImageId);
+			}
+
+			// 직원 정보 삭제
+			employeeRepository.deleteById(id);
+		});
 	}
 
 	private String generateEmployeeNumber() {

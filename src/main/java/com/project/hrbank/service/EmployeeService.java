@@ -7,7 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface EmployeeService {
-	EmployeeResponseDto registerEmployee(EmployeeRequestDto requestDto);
+	EmployeeResponseDto registerEmployee(EmployeeRequestDto requestDto, MultipartFile file);
 
 	Page<EmployeeResponseDto> getEmployees(String nameOrEmail, int page, int size);
 
