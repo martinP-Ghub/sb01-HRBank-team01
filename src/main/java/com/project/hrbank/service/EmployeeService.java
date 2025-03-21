@@ -9,7 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.project.hrbank.dto.request.EmployeeRequestDto;
 import com.project.hrbank.dto.response.EmployeeResponseDto;
-import com.project.hrbank.entity.EmployeeStatus;
+import com.project.hrbank.entity.enums.EmployeeStatus;
 
 public interface EmployeeService {
 	Page<EmployeeResponseDto> getEmployees(String nameOrEmail, String departmentName, String position,
@@ -26,8 +26,10 @@ public interface EmployeeService {
 
 	long countEmployees(EmployeeStatus status, String fromDate, String toDate);
 
+	long countEmployeesByUnit(String unit); // 시간 단위별 직원 수 조회
+
 	long countEmployeesHiredInDateRange(LocalDate fromDate, LocalDate toDate);
 
 	List<Map<String, Object>> getEmployeeDistribution(String groupBy, EmployeeStatus status);
-	List<Map<String, Object>> getEmployeeStatsTrend(LocalDate from, LocalDate to, String unit);
+
 }

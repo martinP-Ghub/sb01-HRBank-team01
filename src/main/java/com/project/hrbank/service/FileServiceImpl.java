@@ -1,19 +1,25 @@
-package com.project.hrbank.file.service;
+package com.project.hrbank.service;
 
 import java.io.IOException;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.project.hrbank.file.FileHandlerFactory;
-import com.project.hrbank.file.entity.FileEntity;
-import com.project.hrbank.file.handler.FileHandler;
-import com.project.hrbank.file.repository.FileRepository;
-import com.project.hrbank.file.storage.FileStorage;
+import com.project.hrbank.entity.FileEntity;
+import com.project.hrbank.repository.FileRepository;
+import com.project.hrbank.util.factory.FileHandlerFactory;
+import com.project.hrbank.util.handler.FileHandler;
+import com.project.hrbank.util.storage.FileStorage;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
 	private final FileRepository fileRepository;
@@ -22,8 +28,8 @@ public class FileServiceImpl implements FileService {
 
 	@Override
 	public FileEntity saveMultipartFile(MultipartFile file) throws IOException {
-		if (file.isEmpty()) {
-			throw new IllegalArgumentException("업로드 파일이 비어있습니다.");
+		if (file == null) {
+			return null;
 		}
 
 		String fileName = (file.getOriginalFilename() != null) ? file.getOriginalFilename() : "unknown_file";
@@ -69,6 +75,7 @@ public class FileServiceImpl implements FileService {
 		}
 		FileEntity existFile = find(fileId);
 		fileStorage.delete(existFile.getId());
+		fileRepository.delete(existFile);
 
 		String fileName = (newFile.getOriginalFilename() != null) ? newFile.getOriginalFilename() : "unknown_file";
 
@@ -84,10 +91,18 @@ public class FileServiceImpl implements FileService {
 	}
 
 	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
 	public void deleteFile(Long fileId) {
-		FileEntity findEntity = find(fileId);
-		fileStorage.delete(findEntity.getId());
-		fileRepository.delete(findEntity);
-	}
+		FileEntity findEntity = fileRepository.findById(fileId)
+			.orElseThrow(() -> new IllegalArgumentException("파일을 찾을 수 없습니다: " + fileId));
 
+		fileRepository.delete(findEntity);
+
+		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+			@Override
+			public void afterCommit() {
+				fileStorage.delete(fileId); // 이제 이건 디스크 삭제만 담당하니까 안전
+			}
+		});
+	}
 }

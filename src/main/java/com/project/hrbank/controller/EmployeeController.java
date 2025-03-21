@@ -4,13 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-import com.project.hrbank.dto.request.EmployeeRequestDto;
-import com.project.hrbank.dto.response.EmployeeResponseDto;
-import com.project.hrbank.entity.EmployeeStatus;
-import com.project.hrbank.service.EmployeeService;
-
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -27,7 +20,13 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.project.hrbank.dto.request.EmployeeRequestDto;
+import com.project.hrbank.dto.response.EmployeeResponseDto;
+import com.project.hrbank.entity.enums.EmployeeStatus;
+import com.project.hrbank.service.EmployeeService;
+
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/employees")
@@ -39,7 +38,7 @@ public class EmployeeController {
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<EmployeeResponseDto> registerEmployee(
 		@RequestPart(value = "employee", required = true) @Valid EmployeeRequestDto requestDto,
-		@RequestPart(value = "profile", required = false) MultipartFile profileImage
+		@RequestPart(value = "profile", required = false)  MultipartFile profileImage
 	) {
 		EmployeeResponseDto responseDto = employeeService.registerEmployee(requestDto, profileImage);
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
@@ -105,17 +104,10 @@ public class EmployeeController {
 	}
 
 	@GetMapping("/stats/trend")
-	public ResponseEntity<List<Map<String, Object>>> getEmployeeStatsTrend(
-		@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-		@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
-		@RequestParam(defaultValue = "month") String unit
-	) {
-		List<Map<String, Object>> statsTrend = employeeService.getEmployeeStatsTrend(from, to, unit);
-		return ResponseEntity.ok(statsTrend);
+	public ResponseEntity<Long> countEmployeesByUnit(@RequestParam String unit) {
+		long count = employeeService.countEmployeesByUnit(unit);
+		return ResponseEntity.ok(count);
 	}
-
-
-
 	@GetMapping("/stats/distribution")
 	public ResponseEntity<List<Map<String, Object>>> getEmployeeDistribution(
 		@RequestParam(defaultValue = "department") String groupBy,
@@ -124,5 +116,6 @@ public class EmployeeController {
 		List<Map<String, Object>> distribution = employeeService.getEmployeeDistribution(groupBy, status);
 		return ResponseEntity.ok(distribution);
 	}
+
 
 }

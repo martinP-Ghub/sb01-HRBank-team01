@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.project.hrbank.entity.Employee;
-import com.project.hrbank.entity.EmployeeStatus;
+import com.project.hrbank.entity.enums.EmployeeStatus;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
@@ -43,7 +43,23 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 		Pageable pageable
 	);
 
+	@Query("SELECT COUNT(e) FROM Employee e WHERE e.hireDate = CURRENT_DATE")
+	long countEmployeesForToday();
 
+	@Query("SELECT COUNT(e) FROM Employee e WHERE YEAR(e.hireDate) = YEAR(CURRENT_DATE) AND WEEK(e.hireDate) = WEEK(CURRENT_DATE)")
+	long countEmployeesForCurrentWeek();
+
+	@Query("SELECT COUNT(e) FROM Employee e WHERE YEAR(e.hireDate) = YEAR(CURRENT_DATE) AND MONTH(e.hireDate) = MONTH(CURRENT_DATE)")
+	long countEmployeesForCurrentMonth();
+
+	@Query("SELECT COUNT(e) FROM Employee e WHERE YEAR(e.hireDate) = YEAR(CURRENT_DATE) AND CEIL(MONTH(e.hireDate)/3.0) = CEIL(MONTH(CURRENT_DATE)/3.0)")
+	long countEmployeesForCurrentQuarter();
+
+	@Query("SELECT COUNT(e) FROM Employee e WHERE YEAR(e.hireDate) = YEAR(CURRENT_DATE)")
+	long countEmployeesForCurrentYear();
+
+	@Query("SELECT COUNT(e) FROM Employee e WHERE e.departmentId = :departmentId")
+	long countEmployeesByDepartmentId(@Param("departmentId") Long departmentId);
 
 	@Query("SELECT d.name AS departmentName, COUNT(e) AS count " +
 		"FROM Employee e JOIN Department d ON e.departmentId = d.id " +
