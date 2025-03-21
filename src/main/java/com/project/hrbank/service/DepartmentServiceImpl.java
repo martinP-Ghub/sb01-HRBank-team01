@@ -12,6 +12,7 @@ import com.project.hrbank.dto.DepartmentDto;
 import com.project.hrbank.dto.response.CursorPageResponse;
 import com.project.hrbank.entity.Department;
 import com.project.hrbank.repository.DepartmentRepository;
+import com.project.hrbank.repository.EmployeeRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 public class DepartmentServiceImpl implements DepartmentService {
 
 	private final DepartmentRepository departmentRepository;
-	private final CursorPaginationService cursorPaginationService;
+	private final EmployeeRepository employeeRepository;
 
 	@Override
 	@Transactional
@@ -41,7 +42,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 			department.getName(),
 			department.getDescription(),
 			department.getEstablishedDate(),
-			0,
+			employeeRepository.countEmployeesByDepartmentId(department.getId()),
 			department.getCreatedAt()
 		);
 	}
@@ -151,7 +152,6 @@ public class DepartmentServiceImpl implements DepartmentService {
 	}
 
 	private long getEmployeeCount(Long departmentId) {
-		// TODO: Replace with actual query from EmployeeRepository
-		return 0;
+		return employeeRepository.countEmployeesByDepartmentId(departmentId);
 	}
 }
