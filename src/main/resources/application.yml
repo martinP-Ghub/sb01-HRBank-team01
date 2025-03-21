@@ -4,7 +4,9 @@ spring:
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: postgresql://${{PGUSER}}:${{POSTGRES_PASSWORD}}@${{RAILWAY_PRIVATE_DOMAIN}}:5432/${{PGDATABASE}}
+    url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}
+    username: ${PGUSER}
+    password: ${PGPASSWORD}
   #    url: jdbc:postgresql://localhost:5432/${DB_NAME}
   #    username: ${USER_NAME}
   #    password: ${USER_PASSWORD}
