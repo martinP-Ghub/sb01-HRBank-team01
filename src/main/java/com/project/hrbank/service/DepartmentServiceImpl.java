@@ -2,11 +2,9 @@ package com.project.hrbank.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,28 +69,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 		String nameOrDescription,
 		Pageable pageable
 	) {
-		Optional<Sort.Order> nameOrder = Optional.ofNullable(pageable.getSort().getOrderFor("name"));
-		Optional<Sort.Order> dateOrder = Optional.ofNullable(pageable.getSort().getOrderFor("establishedDate"));
-
-		if (nameOrder.isPresent()) {
-			if (!"name".equals(pageable.getSort().toString()) || !nameOrder.get()
-				.getDirection()
-				.name()
-				.equalsIgnoreCase(pageable.getSort().getOrderFor("name").getDirection().name())) {
-				cursor = null;
-			}
-		} else if (dateOrder.isPresent()) {
-			if (!"establishedDate".equals(pageable.getSort().toString()) || !dateOrder.get()
-				.getDirection()
-				.name()
-				.equalsIgnoreCase(pageable.getSort().getOrderFor("establishedDate").getDirection().name())) {
-				cursor = null;
-			}
-		}
-
-		if (!nameOrDescription.isBlank()) {
-			cursor = null;
-		}
+		cursor = null;
 
 		String searchQuery = nameOrDescription.isBlank() ? "" : nameOrDescription.trim();
 
