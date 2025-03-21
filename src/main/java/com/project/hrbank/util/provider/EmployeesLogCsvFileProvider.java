@@ -18,7 +18,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import com.project.hrbank.entity.Employee;
-import com.project.hrbank.entity.EmployeeLogs;
 import com.project.hrbank.entity.enums.FileExtension;
 import com.project.hrbank.file.entity.FileEntity;
 import com.project.hrbank.repository.EmployeeRepository;
@@ -41,7 +40,8 @@ public class EmployeesLogCsvFileProvider {
 	) {
 		this.employeeRepository = employeeRepository;
 		this.logFileProvider = logFileProvider;
-		DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, EmployeeLogs.class.getSimpleName());
+		// TODO 하드 코딩 된 부분 제거
+		DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, "csv");
 
 		if (Files.notExists(DIRECTORY)) {
 			try {
