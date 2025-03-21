@@ -1,4 +1,4 @@
-package com.project.hrbank.backup.repository;
+package com.project.hrbank.repository;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -9,8 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.project.hrbank.backup.domain.Backup;
-import com.project.hrbank.backup.domain.Status;
+import com.project.hrbank.entity.Backup;
+import com.project.hrbank.entity.enums.Status;
 
 public interface BackupRepository extends JpaRepository<Backup, Long> {
 

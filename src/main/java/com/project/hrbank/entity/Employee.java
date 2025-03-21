@@ -3,6 +3,8 @@ package com.project.hrbank.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.project.hrbank.entity.enums.EmployeeStatus;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

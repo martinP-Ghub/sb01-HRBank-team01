@@ -1,4 +1,4 @@
-package com.project.hrbank.backup.provider;
+package com.project.hrbank.util.provider;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.project.hrbank.file.entity.enums.FileExtension;
+import com.project.hrbank.entity.enums.FileExtension;
 
 @Component
 public class LogFileProvider {
@@ -50,7 +50,7 @@ public class LogFileProvider {
 		}
 	}
 
-	private static void deleteFailEmployeeLogFile(Path failedEmployeesLogFilePath) {
+	private void deleteFailEmployeeLogFile(Path failedEmployeesLogFilePath) {
 		try {
 			Files.deleteIfExists(failedEmployeesLogFilePath);
 		} catch (IOException exception) {

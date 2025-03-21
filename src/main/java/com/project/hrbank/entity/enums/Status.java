@@ -1,4 +1,4 @@
-package com.project.hrbank.backup.domain;
+package com.project.hrbank.entity.enums;
 
 import lombok.RequiredArgsConstructor;
 

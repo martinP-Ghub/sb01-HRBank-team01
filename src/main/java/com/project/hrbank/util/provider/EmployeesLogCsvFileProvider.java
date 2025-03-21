@@ -1,4 +1,4 @@
-package com.project.hrbank.backup.provider;
+package com.project.hrbank.util.provider;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -18,9 +18,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import com.project.hrbank.entity.Employee;
-import com.project.hrbank.entity.EmployeeLogs;
+import com.project.hrbank.entity.enums.FileExtension;
 import com.project.hrbank.file.entity.FileEntity;
-import com.project.hrbank.file.entity.enums.FileExtension;
 import com.project.hrbank.repository.EmployeeRepository;
 
 @Component
@@ -41,7 +40,8 @@ public class EmployeesLogCsvFileProvider {
 	) {
 		this.employeeRepository = employeeRepository;
 		this.logFileProvider = logFileProvider;
-		DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, EmployeeLogs.class.getSimpleName());
+		// TODO 하드 코딩 된 부분 제거
+		DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, "csv");
 
 		if (Files.notExists(DIRECTORY)) {
 			try {
@@ -78,7 +78,8 @@ public class EmployeesLogCsvFileProvider {
 			} while (employeePage.hasNext());
 
 			long fileSize = Files.size(employeesLogFilePath);
-			FileEntity fileEntity = new FileEntity(fileName, FileExtension.CSV.getDescription(), fileSize, employeesLogFilePath.getParent().toString());
+			FileEntity fileEntity = new FileEntity(fileName, FileExtension.CSV.getDescription(), fileSize, employeesLogFilePath.toString());
+
 			return Optional.of(fileEntity);
 		} catch (IOException saveException) {
 			logFileProvider.writeErrorLog(employeesLogFilePath, saveException);

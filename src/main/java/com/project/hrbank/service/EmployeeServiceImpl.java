@@ -9,17 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.hrbank.dto.DepartmentDto;
-import com.project.hrbank.dto.request.EmployeeRequestDto;
-import com.project.hrbank.dto.response.EmployeeResponseDto;
-import com.project.hrbank.entity.Employee;
-import com.project.hrbank.entity.EmployeeStatus;
-import com.project.hrbank.repository.EmployeeRepository;
-
-import lombok.RequiredArgsConstructor;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -37,7 +26,7 @@ import com.project.hrbank.dto.DepartmentDto;
 import com.project.hrbank.dto.request.EmployeeRequestDto;
 import com.project.hrbank.dto.response.EmployeeResponseDto;
 import com.project.hrbank.entity.Employee;
-import com.project.hrbank.entity.EmployeeStatus;
+import com.project.hrbank.entity.enums.EmployeeStatus;
 import com.project.hrbank.repository.EmployeeRepository;
 import com.project.hrbank.util.IpUtils;
 
@@ -47,11 +36,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
 
-	private final JdbcTemplate jdbcTemplate;
+	private static final Logger logger = LoggerFactory.getLogger(EmployeeServiceImpl.class);
 
+	private final JdbcTemplate jdbcTemplate;
 	private final EmployeeRepository employeeRepository;
 	private final DepartmentService departmentService;
-	private static final Logger logger = LoggerFactory.getLogger(EmployeeServiceImpl.class);
+	private final IpUtils ipUtils;
 
 	@Override
 	public EmployeeResponseDto registerEmployee(EmployeeRequestDto requestDto, MultipartFile profileImage) {
@@ -270,7 +260,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 				sql,
 				type,
 				jsonString,
-				IpUtils.getClientIp(),
+				ipUtils.getClientIp(),
 				employeeNumber,
 				LocalDateTime.now(),
 				memo
