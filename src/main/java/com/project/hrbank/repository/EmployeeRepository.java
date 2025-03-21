@@ -72,5 +72,4 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 		"WHERE e.status = :status " +
 		"GROUP BY e.position")
 	List<Object[]> countEmployeesGroupedByPosition(@Param("status") EmployeeStatus status);
-
 }

@@ -54,6 +54,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Override
 	@Transactional
+
 	public EmployeeResponseDto registerEmployee(EmployeeRequestDto requestDto, MultipartFile profileImage) {
 		if (employeeRepository.existsByEmail(requestDto.getEmail())) {
 			throw new IllegalArgumentException("중복된 이메일입니다.");
