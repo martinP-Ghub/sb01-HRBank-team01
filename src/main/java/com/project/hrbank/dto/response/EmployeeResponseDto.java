@@ -3,7 +3,7 @@ package com.project.hrbank.dto.response;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import com.project.hrbank.entity.EmployeeStatus;
+import com.project.hrbank.entity.enums.EmployeeStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

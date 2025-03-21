@@ -1,4 +1,4 @@
-package com.project.hrbank.backup.service;
+package com.project.hrbank.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -9,13 +9,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.project.hrbank.backup.domain.Backup;
-import com.project.hrbank.backup.domain.Status;
-import com.project.hrbank.backup.dto.response.BackupDto;
-import com.project.hrbank.backup.dto.response.CursorPageResponseBackupDto;
-import com.project.hrbank.backup.provider.EmployeesLogCsvFileProvider;
-import com.project.hrbank.backup.repository.BackupRepository;
+import com.project.hrbank.dto.response.BackupResponse;
+import com.project.hrbank.dto.response.CursorPageResponse;
+import com.project.hrbank.entity.Backup;
+import com.project.hrbank.entity.enums.Status;
+import com.project.hrbank.repository.BackupRepository;
 import com.project.hrbank.repository.EmployeeLogRepository;
+import com.project.hrbank.util.provider.EmployeesLogCsvFileProvider;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,7 +30,7 @@ public class BackupService {
 	private final EmployeeLogRepository employeeLogRepository;
 	private final EmployeesLogCsvFileProvider csvProvider;
 
-	public CursorPageResponseBackupDto findAll(
+	public CursorPageResponse<BackupResponse> findAll(
 		LocalDateTime cursor,
 		Status status,
 		LocalDateTime startedAtFrom,
@@ -43,7 +43,7 @@ public class BackupService {
 
 		Page<Backup> page = backupRepository.findAllBy(cursor, status, startedAtFrom, startedAtTo, pageable);
 
-		List<BackupDto> content = getBackupContents(page);
+		List<BackupResponse> content = getBackupContents(page);
 
 		LocalDateTime nextCursor = null;
 		if (page.hasContent()) {
@@ -55,10 +55,10 @@ public class BackupService {
 			nextIdAfter = content.get(content.size() - 1).id();
 		}
 
-		return new CursorPageResponseBackupDto(content, nextCursor, nextIdAfter, content.size(), page.hasNext(), page.getTotalElements());
+		return new CursorPageResponse<BackupResponse>(content, nextCursor, nextIdAfter, content.size(), page.hasNext(), page.getTotalElements());
 	}
 
-	private List<BackupDto> getBackupContents(Page<Backup> slice) {
+	private List<BackupResponse> getBackupContents(Page<Backup> slice) {
 		return slice.getContent()
 			.stream()
 			.map(this::toDto)
@@ -71,7 +71,7 @@ public class BackupService {
 	}
 
 	@Transactional
-	public BackupDto backup(String clientIpAddr) {
+	public BackupResponse backup(String clientIpAddr) {
 
 		Backup backup = generateBackup(clientIpAddr);
 
@@ -110,7 +110,7 @@ public class BackupService {
 			);
 	}
 
-	public BackupDto findLatest() {
+	public BackupResponse findLatest() {
 		Backup backup = getLastBackup();
 		return toDto(backup);
 	}
@@ -122,8 +122,8 @@ public class BackupService {
 			.orElse(null);
 	}
 
-	private BackupDto toDto(Backup backup) {
-		return BackupDto.toDto(backup);
+	private BackupResponse toDto(Backup backup) {
+		return BackupResponse.toDto(backup);
 	}
 
 }
