@@ -8,8 +8,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import com.project.hrbank.file.entity.FileEntity;
-import com.project.hrbank.file.storage.LocalFileStorage;
+import com.project.hrbank.entity.FileEntity;
+import com.project.hrbank.util.factory.FileHandlerFactory;
+import com.project.hrbank.util.storage.LocalFileStorage;
 
 import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;

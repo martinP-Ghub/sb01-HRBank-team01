@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.project.hrbank.entity.Employee;
-import com.project.hrbank.entity.EmployeeStatus;
+import com.project.hrbank.entity.enums.EmployeeStatus;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
