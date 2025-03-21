@@ -1,6 +1,7 @@
 package com.project.hrbank.repository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -59,4 +60,16 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
 	@Query("SELECT COUNT(e) FROM Employee e WHERE e.departmentId = :departmentId")
 	long countEmployeesByDepartmentId(@Param("departmentId") Long departmentId);
+
+	@Query("SELECT d.name AS departmentName, COUNT(e) AS count " +
+		"FROM Employee e JOIN Department d ON e.departmentId = d.id " +
+		"WHERE e.status = :status " +
+		"GROUP BY d.name")
+	List<Object[]> countEmployeesGroupedByDepartment(@Param("status") EmployeeStatus status);
+
+	@Query("SELECT e.position AS positionName, COUNT(e) AS count " +
+		"FROM Employee e " +
+		"WHERE e.status = :status " +
+		"GROUP BY e.position")
+	List<Object[]> countEmployeesGroupedByPosition(@Param("status") EmployeeStatus status);
 }

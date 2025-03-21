@@ -53,6 +53,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	private final FileRepository fileRepository;
 
 	@Override
+	@Transactional
 
 	public EmployeeResponseDto registerEmployee(EmployeeRequestDto requestDto, MultipartFile profileImage) {
 		if (employeeRepository.existsByEmail(requestDto.getEmail())) {
@@ -72,7 +73,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 		try {
 			FileEntity fileEntity = fileService.saveMultipartFile(profileImage);
-			employee.setProfileImageId(fileEntity.getId());
+			if (fileEntity == null) {
+				employee.setEmployeeId(null);
+			} else {
+				employee.setProfileImageId(fileEntity.getId());
+			}
 		} catch (IOException e) {
 			throw new RuntimeException(e.getMessage());
 		}
@@ -80,16 +85,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 		Employee savedEmployee = employeeRepository.save(employee);
 
 		List<Map<String, Object>> logData = new ArrayList<>();
-		logData.add(createLogEntry("employee_number", null, savedEmployee.getEmployeeNumber()));
-		logData.add(createLogEntry("hire_date", null, employee.getHireDate().toString()));
+		logData.add(createLogEntry("hireDate", null, employee.getHireDate().toString()));
 		logData.add(createLogEntry("name", null, employee.getName()));
 		logData.add(createLogEntry("position", null, employee.getPosition()));
 		logData.add(createLogEntry("department", null, String.valueOf(employee.getDepartmentId())));
 		logData.add(createLogEntry("email", null, employee.getEmail()));
 		logData.add(createLogEntry("status", null, employee.getStatus().toString()));
-		if (requestDto.getMemo() != null && !requestDto.getMemo().isEmpty()) {
-			logData.add(createLogEntry("memo", null, requestDto.getMemo()));
-		}
 
 		saveLog("CREATED", logData, savedEmployee.getEmployeeNumber(), requestDto.getMemo());
 
@@ -134,7 +135,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		List<Map<String, Object>> logData = new ArrayList<>();
 
 		if (!Objects.equals(existingEmployee.getHireDate(), dto.getHireDate())) {
-			logData.add(createLogEntry("hire_date",
+			logData.add(createLogEntry("hireDate",
 				existingEmployee.getHireDate() != null ? existingEmployee.getHireDate().toString() : null,
 				dto.getHireDate() != null ? dto.getHireDate().toString() : null));
 			existingEmployee.setHireDate(dto.getHireDate());
@@ -199,8 +200,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 		List<Map<String, Object>> logData = new ArrayList<>();
 
-		logData.add(createLogEntry("employee_number", employee.getEmployeeNumber(), null));
-		logData.add(createLogEntry("hire_date",
+		logData.add(createLogEntry("hireDate",
 			employee.getHireDate() != null ? employee.getHireDate().toString() : null,
 			null));
 		logData.add(createLogEntry("name", employee.getName(), null));
@@ -312,6 +312,40 @@ public class EmployeeServiceImpl implements EmployeeService {
 		entry.put("after", after);
 		return entry;
 	}
+
+	@Override
+	public List<Map<String, Object>> getEmployeeDistribution(String groupBy, EmployeeStatus status) {
+		List<Object[]> results;
+
+		switch (groupBy.toLowerCase()) {
+			case "department":
+				results = employeeRepository.countEmployeesGroupedByDepartment(status);
+				break;
+			case "position":
+				results = employeeRepository.countEmployeesGroupedByPosition(status);
+				break;
+			default:
+				throw new IllegalArgumentException("Invalid groupBy value: " + groupBy);
+		}
+
+		long totalCount = employeeRepository.countByStatus(status);
+
+		List<Map<String, Object>> distribution = new ArrayList<>();
+		for (Object[] result : results) {
+			String key = (String) result[0];
+			Long count = (Long) result[1];
+			double percentage = ((double) count / totalCount) * 100;
+
+			Map<String, Object> entry = new HashMap<>();
+			entry.put("groupKey", key);
+			entry.put("count", count);
+			entry.put("percentage", Math.round(percentage * 100.0) / 100.0); // 소수점 2자리 반올림
+			distribution.add(entry);
+		}
+
+		return distribution;
+	}
+
 
 	private EmployeeResponseDto convertToDto(Employee employee) {
 		DepartmentDto departmentDto = departmentService.getDepartmentById(employee.getDepartmentId());

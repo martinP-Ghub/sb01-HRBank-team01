@@ -67,5 +67,11 @@ public class Employee {
 		createdAt = LocalDateTime.now();
 		status = EmployeeStatus.ACTIVE;
 	}
+	public Long getProfileImageId() {
+		if (this.profileImageId == null) {
+			return null;
+		}
+		return profileImageId;
+	}
 }
 

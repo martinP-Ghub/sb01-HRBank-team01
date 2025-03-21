@@ -9,10 +9,10 @@ import org.springframework.transaction.support.TransactionSynchronizationAdapter
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.project.hrbank.util.factory.FileHandlerFactory;
 import com.project.hrbank.entity.FileEntity;
-import com.project.hrbank.util.handler.FileHandler;
 import com.project.hrbank.repository.FileRepository;
+import com.project.hrbank.util.factory.FileHandlerFactory;
+import com.project.hrbank.util.handler.FileHandler;
 import com.project.hrbank.util.storage.FileStorage;
 
 import lombok.RequiredArgsConstructor;
@@ -28,8 +28,8 @@ public class FileServiceImpl implements FileService {
 
 	@Override
 	public FileEntity saveMultipartFile(MultipartFile file) throws IOException {
-		if (file.isEmpty()) {
-			throw new IllegalArgumentException("업로드 파일이 비어있습니다.");
+		if (file == null) {
+			return null;
 		}
 
 		String fileName = (file.getOriginalFilename() != null) ? file.getOriginalFilename() : "unknown_file";

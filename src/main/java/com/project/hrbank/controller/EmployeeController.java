@@ -2,6 +2,9 @@ package com.project.hrbank.controller;
 
 import java.time.LocalDate;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -36,7 +39,7 @@ public class EmployeeController {
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<EmployeeResponseDto> registerEmployee(
 		@RequestPart(value = "employee", required = true) @Valid EmployeeRequestDto requestDto,
-		@RequestPart(value = "profile", required = false) MultipartFile profileImage
+		@RequestPart(value = "profile", required = false)  MultipartFile profileImage
 	) {
 		EmployeeResponseDto responseDto = employeeService.registerEmployee(requestDto, profileImage);
 		return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
@@ -106,4 +109,14 @@ public class EmployeeController {
 		long count = employeeService.countEmployeesByUnit(unit);
 		return ResponseEntity.ok(count);
 	}
+	@GetMapping("/stats/distribution")
+	public ResponseEntity<List<Map<String, Object>>> getEmployeeDistribution(
+		@RequestParam(defaultValue = "department") String groupBy,
+		@RequestParam(defaultValue = "ACTIVE") EmployeeStatus status
+	) {
+		List<Map<String, Object>> distribution = employeeService.getEmployeeDistribution(groupBy, status);
+		return ResponseEntity.ok(distribution);
+	}
+
+
 }
