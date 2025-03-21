@@ -1,10 +1,10 @@
-package com.project.hrbank.file;
+package com.project.hrbank.util.factory;
 
 import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.project.hrbank.file.handler.FileHandler;
+import com.project.hrbank.util.handler.FileHandler;
 
 @Component
 public class FileHandlerFactory {

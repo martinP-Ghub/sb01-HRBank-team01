@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import com.project.hrbank.entity.base.BaseTimeEntity;
 import com.project.hrbank.entity.enums.Status;
-import com.project.hrbank.file.entity.FileEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

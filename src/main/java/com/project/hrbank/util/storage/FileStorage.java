@@ -1,8 +1,8 @@
-package com.project.hrbank.file.storage;
+package com.project.hrbank.util.storage;
 
 import java.io.InputStream;
 
-import com.project.hrbank.file.entity.FileEntity;
+import com.project.hrbank.entity.FileEntity;
 
 public interface FileStorage {
 

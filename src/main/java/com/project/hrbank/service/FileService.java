@@ -1,10 +1,10 @@
-package com.project.hrbank.file.service;
+package com.project.hrbank.service;
 
 import java.io.IOException;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.project.hrbank.file.entity.FileEntity;
+import com.project.hrbank.entity.FileEntity;
 
 public interface FileService {
 

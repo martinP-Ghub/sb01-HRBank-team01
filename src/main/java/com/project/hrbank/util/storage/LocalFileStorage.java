@@ -1,4 +1,4 @@
-package com.project.hrbank.file.storage;
+package com.project.hrbank.util.storage;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -7,11 +7,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+
 import org.springframework.stereotype.Service;
 
-import com.project.hrbank.file.FileHandlerFactory;
-import com.project.hrbank.file.entity.FileEntity;
-import com.project.hrbank.file.repository.FileRepository;
+import com.project.hrbank.util.factory.FileHandlerFactory;
+import com.project.hrbank.entity.FileEntity;
+import com.project.hrbank.repository.FileRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -96,6 +97,7 @@ public class LocalFileStorage implements FileStorage {
 		}
 	}
 
+
 	@Override
 	public boolean delete(Long id) {
 		try {
@@ -109,12 +111,7 @@ public class LocalFileStorage implements FileStorage {
 			}
 
 			Path filePath = Paths.get(filePathStr);
-
-			boolean isDeleted = Files.deleteIfExists(filePath);
-
-			fileRepository.delete(fileEntity);
-
-			return isDeleted;
+			return Files.deleteIfExists(filePath);
 		} catch (IOException e) {
 			throw new RuntimeException("파일 삭제 실패: " + e.getMessage(), e);
 		}
