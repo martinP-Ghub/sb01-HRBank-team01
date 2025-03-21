@@ -50,7 +50,7 @@ public class LogFileProvider {
 		}
 	}
 
-	private static void deleteFailEmployeeLogFile(Path failedEmployeesLogFilePath) {
+	private void deleteFailEmployeeLogFile(Path failedEmployeesLogFilePath) {
 		try {
 			Files.deleteIfExists(failedEmployeesLogFilePath);
 		} catch (IOException exception) {

@@ -16,6 +16,7 @@ import com.project.hrbank.dto.response.BackupResponse;
 import com.project.hrbank.dto.response.CursorPageResponse;
 import com.project.hrbank.entity.enums.Status;
 import com.project.hrbank.service.BackupService;
+import com.project.hrbank.util.IpUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +27,9 @@ import lombok.RequiredArgsConstructor;
 public class BackupController {
 
 	private final BackupService backupService;
+	private final IpUtils ipUtils;
 
 	@GetMapping
-
 	public ResponseEntity<CursorPageResponse<BackupResponse>> findAll(
 		@RequestParam(required = false) LocalDateTime cursor,
 		@RequestParam(required = false) Status status,
@@ -44,7 +45,7 @@ public class BackupController {
 
 	@PostMapping
 	public ResponseEntity<BackupResponse> backup(HttpServletRequest request) {
-		String clientIpAddr = request.getRemoteAddr();
+		String clientIpAddr = ipUtils.extractClientIp(request);
 		BackupResponse backup = backupService.backup(clientIpAddr);
 		return ResponseEntity.ok(backup);
 	}

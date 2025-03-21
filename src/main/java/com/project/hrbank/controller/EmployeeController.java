@@ -2,13 +2,6 @@ package com.project.hrbank.controller;
 
 import java.time.LocalDate;
 
-import com.project.hrbank.dto.request.EmployeeRequestDto;
-import com.project.hrbank.dto.response.EmployeeResponseDto;
-import com.project.hrbank.entity.EmployeeStatus;
-import com.project.hrbank.service.EmployeeService;
-
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -27,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.project.hrbank.dto.request.EmployeeRequestDto;
 import com.project.hrbank.dto.response.EmployeeResponseDto;
-import com.project.hrbank.entity.EmployeeStatus;
+import com.project.hrbank.entity.enums.EmployeeStatus;
 import com.project.hrbank.service.EmployeeService;
 
 import jakarta.validation.Valid;
