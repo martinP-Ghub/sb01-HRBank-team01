@@ -36,12 +36,3 @@ public class GlobalExceptionHandlerAdvice {
 	}
 
 }
-
-/**
- * {
- *   "timestamp": "2025-03-06T05:39:06.152068Z",
- *   "status": 400,
- *   "message": "잘못된 요청입니다.",
- *   "details": "부서 코드는 필수입니다."
- * }
- */
