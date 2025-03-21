@@ -1,11 +1,11 @@
 package com.project.hrbank.backup.dto.response;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record CursorPageResponseBackupDto(
 	List<BackupDto> content,
-	Instant nextCursor,
+	LocalDateTime nextCursor,
 	Long nextIdAfter,
 	int size,
 	boolean hasNext,

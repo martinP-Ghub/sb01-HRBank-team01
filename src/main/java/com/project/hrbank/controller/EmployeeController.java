@@ -1,18 +1,30 @@
 package com.project.hrbank.controller;
 
+import java.time.LocalDate;
+
 import com.project.hrbank.dto.request.EmployeeRequestDto;
 import com.project.hrbank.dto.response.EmployeeResponseDto;
-import com.project.hrbank.file.service.FileService;
+import com.project.hrbank.entity.EmployeeStatus;
 import com.project.hrbank.service.EmployeeService;
 
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
 
 import jakarta.validation.Valid;
 
@@ -22,11 +34,10 @@ import jakarta.validation.Valid;
 public class EmployeeController {
 
 	private final EmployeeService employeeService;
-	private final FileService fileService;
 
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<EmployeeResponseDto> registerEmployee(
-		@RequestPart("employee") @Valid EmployeeRequestDto requestDto,
+		@RequestPart(value = "employee", required = true) @Valid EmployeeRequestDto requestDto,
 		@RequestPart(value = "profile", required = false) MultipartFile profileImage
 	) {
 		EmployeeResponseDto responseDto = employeeService.registerEmployee(requestDto, profileImage);
@@ -36,9 +47,16 @@ public class EmployeeController {
 	@GetMapping
 	public ResponseEntity<Page<EmployeeResponseDto>> getEmployees(
 		@RequestParam(required = false) String nameOrEmail,
+		@RequestParam(required = false) String departmentName,
+		@RequestParam(required = false) String position,
+		@RequestParam(required = false) EmployeeStatus status,
 		@RequestParam(defaultValue = "0") int page,
-		@RequestParam(defaultValue = "30") int size) {
-		Page<EmployeeResponseDto> employees = employeeService.getEmployees(nameOrEmail, page, size);
+		@RequestParam(defaultValue = "30") int size,
+		@RequestParam(defaultValue = "name") String sortField,
+		@RequestParam(defaultValue = "asc") String sortDirection
+	) {
+		Page<EmployeeResponseDto> employees = employeeService.getEmployees(nameOrEmail, departmentName, position,
+			status, page, size, sortField, sortDirection);
 		return ResponseEntity.ok(employees);
 	}
 
@@ -65,8 +83,29 @@ public class EmployeeController {
 	}
 
 	@GetMapping("/count")
-	public ResponseEntity<Long> countEmployees() {
-		long count = employeeService.countActiveEmployees();
+	public ResponseEntity<Long> countEmployees(
+		@RequestParam(required = false) EmployeeStatus status,
+		@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) String fromDate,
+		@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) String toDate
+	) {
+		if (fromDate != null && toDate != null) {
+			LocalDate start = LocalDate.parse(fromDate);
+			LocalDate end = LocalDate.parse(toDate);
+			long count = employeeService.countEmployeesHiredInDateRange(start, end);
+			return ResponseEntity.ok(count);
+		} else {
+			long count = employeeService.countEmployees(
+				status,
+				fromDate,
+				toDate
+			);
+			return ResponseEntity.ok(count);
+		}
+	}
+
+	@GetMapping("/stats/trend")
+	public ResponseEntity<Long> countEmployeesByUnit(@RequestParam String unit) {
+		long count = employeeService.countEmployeesByUnit(unit);
 		return ResponseEntity.ok(count);
 	}
 }

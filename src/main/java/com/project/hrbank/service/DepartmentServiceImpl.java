@@ -1,21 +1,26 @@
 package com.project.hrbank.service;
 
-import org.springframework.data.domain.Page;
+import java.time.LocalDateTime;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.project.hrbank.dto.DepartmentDto;
+import com.project.hrbank.dto.response.CursorPageResponse;
 import com.project.hrbank.entity.Department;
 import com.project.hrbank.repository.DepartmentRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DepartmentServiceImpl implements DepartmentService {
 
 	private final DepartmentRepository departmentRepository;
+	private final CursorPaginationService cursorPaginationService;
 
 	@Override
 	@Transactional
@@ -57,10 +62,27 @@ public class DepartmentServiceImpl implements DepartmentService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Page<DepartmentDto> getAllDepartments(Pageable pageable) {
-		return departmentRepository.findAll(pageable)
-			.map(department -> new DepartmentDto(department.getId(), department.getName(), department.getDescription(),
-				department.getEstablishedDate(), getEmployeeCount(department.getId()), department.getCreatedAt()));
+	public CursorPageResponse<DepartmentDto> getAllDepartments(LocalDateTime cursor, String nameOrDescription,
+		Pageable pageable) {
+		return cursorPaginationService.getPaginatedResults(
+			cursor,
+			pageable,
+			departmentRepository,
+			department -> new DepartmentDto(
+				department.getId(),
+				department.getName(),
+				department.getDescription(),
+				department.getEstablishedDate(),
+				getEmployeeCount(department.getId()),
+				department.getCreatedAt()
+			),
+			Department::getCreatedAt,
+			Department::getId,
+			(cur, page) -> departmentRepository.findNextDepartments(
+				cur,
+				nameOrDescription,
+				page
+			));
 	}
 
 	@Override
