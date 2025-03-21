@@ -25,8 +25,8 @@ public class CustomPageableArgumentResolver extends PageableHandlerMethodArgumen
 		NativeWebRequest webRequest,
 		WebDataBinderFactory binderFactory
 	) {
-
-		String sortFieldValue = getSortFieldValue(webRequest);
+		DefaultSortField defaultSortField = methodParameter.getMethodAnnotation(DefaultSortField.class);
+		String sortFieldValue = extractingSortValue(defaultSortField, webRequest);
 		Sort.Direction sortDirectionValue = getSortDirectionValue(webRequest);
 		int pageValue = getIntegerOrDefault(webRequest.getParameter(PAGE), 0);
 		int sizeValue = getIntegerOrDefault(webRequest.getParameter(SIZE), 30);
@@ -34,8 +34,18 @@ public class CustomPageableArgumentResolver extends PageableHandlerMethodArgumen
 		return PageRequest.of(pageValue, sizeValue, Sort.by(sortDirectionValue, sortFieldValue));
 	}
 
+	private String extractingSortValue(DefaultSortField methodAnnotation, NativeWebRequest webRequest) {
+		String sortField = webRequest.getParameter(SORT_FIELD_KEY);
+
+		if (isSortFieldNull(sortField)) {
+			return methodAnnotation.value();
+		}
+
+		return sortField;
+	}
+
 	private int getIntegerOrDefault(String value, int defaultValue) {
-		if (value == null || value.isBlank()) {
+		if (isSortFieldNull(value)) {
 			return defaultValue;
 		}
 
@@ -46,17 +56,9 @@ public class CustomPageableArgumentResolver extends PageableHandlerMethodArgumen
 		}
 	}
 
-	private String getSortFieldValue(NativeWebRequest webRequest) {
-		String sortField = webRequest.getParameter(SORT_FIELD_KEY);
-		if (sortField == null || sortField.isBlank()) {
-			return "startedAt";
-		}
-		return sortField;
-	}
-
 	private Sort.Direction getSortDirectionValue(NativeWebRequest webRequest) {
 		String sortDirection = webRequest.getParameter(SORT_DIRECTION_KEY);
-		if (sortDirection == null || sortDirection.isBlank()) {
+		if (isSortFieldNull(sortDirection)) {
 			return Sort.Direction.DESC;
 		}
 
@@ -65,6 +67,10 @@ public class CustomPageableArgumentResolver extends PageableHandlerMethodArgumen
 		} catch (IllegalArgumentException exception) {
 			return Sort.Direction.DESC;
 		}
+	}
+
+	private boolean isSortFieldNull(String sortField) {
+		return sortField == null || sortField.isBlank();
 	}
 
 }
