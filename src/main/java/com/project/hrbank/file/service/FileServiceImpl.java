@@ -75,6 +75,7 @@ public class FileServiceImpl implements FileService {
 		}
 		FileEntity existFile = find(fileId);
 		fileStorage.delete(existFile.getId());
+		fileRepository.delete(existFile);
 
 		String fileName = (newFile.getOriginalFilename() != null) ? newFile.getOriginalFilename() : "unknown_file";
 

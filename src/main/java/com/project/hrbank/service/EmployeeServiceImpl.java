@@ -22,7 +22,6 @@ import com.project.hrbank.entity.EmployeeStatus;
 import com.project.hrbank.file.entity.FileEntity;
 import com.project.hrbank.file.repository.FileRepository;
 import com.project.hrbank.file.service.FileService;
-import com.project.hrbank.file.storage.FileStorage;
 import com.project.hrbank.repository.EmployeeRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -54,7 +53,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 	private final EmployeeRepository employeeRepository;
 	private final DepartmentService departmentService;
 	private final FileService fileService;
-	private final FileStorage fileStorage;
 	private final FileRepository fileRepository;
 	private static final Logger logger = LoggerFactory.getLogger(EmployeeServiceImpl.class);
 
@@ -176,12 +174,17 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 		// 프로필 이미지 처리
 		if (profileImage != null && !profileImage.isEmpty()) {
-			Long profileImageId = saveProfileImage(profileImage);
-			logData.add(createLogEntry("profile_image",
-				existingEmployee.getProfileImageId() != null ? String.valueOf(existingEmployee.getProfileImageId()) :
-					null,
-				profileImageId != null ? String.valueOf(profileImageId) : null));
-			existingEmployee.setProfileImageId(profileImageId);
+			try {
+				FileEntity fileEntity = fileService.updateFile(existingEmployee.getProfileImageId(), profileImage);
+				Long profileImageId = fileEntity.getId();
+				logData.add(createLogEntry("profile_image",
+					existingEmployee.getProfileImageId() != null ? String.valueOf(existingEmployee.getProfileImageId()) :
+						null,
+					profileImageId != null ? String.valueOf(profileImageId) : null));
+				existingEmployee.setProfileImageId(profileImageId);
+			}catch (IOException e) {
+				throw new RuntimeException(e.getMessage());
+			}
 		}
 
 		String employeeNumber = existingEmployee.getEmployeeNumber();
@@ -191,17 +194,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 		return convertToDto(existingEmployee);
 	}
 
-	//파일 저장예시코드
-	private Long saveProfileImage(MultipartFile profileImage) {
-		try {
-			String fileName = profileImage.getOriginalFilename();
-			byte[] fileBytes = profileImage.getBytes();
-
-			return 123L;
-		} catch (IOException e) {
-			throw new RuntimeException("프로필 이미지를 저장하는 데 실패했습니다.", e);
-		}
-	}
 
 	@Transactional
 	@Override
