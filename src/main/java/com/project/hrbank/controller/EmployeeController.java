@@ -1,6 +1,8 @@
 package com.project.hrbank.controller;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 import com.project.hrbank.dto.request.EmployeeRequestDto;
 import com.project.hrbank.dto.response.EmployeeResponseDto;
@@ -25,13 +27,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.project.hrbank.dto.request.EmployeeRequestDto;
-import com.project.hrbank.dto.response.EmployeeResponseDto;
-import com.project.hrbank.entity.EmployeeStatus;
-import com.project.hrbank.service.EmployeeService;
-
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/employees")
@@ -109,8 +105,24 @@ public class EmployeeController {
 	}
 
 	@GetMapping("/stats/trend")
-	public ResponseEntity<Long> countEmployeesByUnit(@RequestParam String unit) {
-		long count = employeeService.countEmployeesByUnit(unit);
-		return ResponseEntity.ok(count);
+	public ResponseEntity<List<Map<String, Object>>> getEmployeeStatsTrend(
+		@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+		@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+		@RequestParam(defaultValue = "month") String unit
+	) {
+		List<Map<String, Object>> statsTrend = employeeService.getEmployeeStatsTrend(from, to, unit);
+		return ResponseEntity.ok(statsTrend);
 	}
+
+
+
+	@GetMapping("/stats/distribution")
+	public ResponseEntity<List<Map<String, Object>>> getEmployeeDistribution(
+		@RequestParam(defaultValue = "department") String groupBy,
+		@RequestParam(defaultValue = "ACTIVE") EmployeeStatus status
+	) {
+		List<Map<String, Object>> distribution = employeeService.getEmployeeDistribution(groupBy, status);
+		return ResponseEntity.ok(distribution);
+	}
+
 }

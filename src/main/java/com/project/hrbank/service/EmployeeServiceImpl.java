@@ -31,17 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.hrbank.dto.DepartmentDto;
-import com.project.hrbank.dto.request.EmployeeRequestDto;
-import com.project.hrbank.dto.response.EmployeeResponseDto;
-import com.project.hrbank.entity.Employee;
-import com.project.hrbank.entity.EmployeeStatus;
-import com.project.hrbank.repository.EmployeeRepository;
 import com.project.hrbank.util.IpUtils;
-
-import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -236,21 +226,24 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	@Override
-	public long countEmployeesByUnit(String unit) {
-		switch (unit.toLowerCase()) {
-			case "day":
-				return employeeRepository.countEmployeesForToday();
-			case "week":
-				return employeeRepository.countEmployeesForCurrentWeek();
-			case "month":
-				return employeeRepository.countEmployeesForCurrentMonth();
-			case "quarter":
-				return employeeRepository.countEmployeesForCurrentQuarter();
-			case "year":
-				return employeeRepository.countEmployeesForCurrentYear();
-			default:
-				throw new IllegalArgumentException("Invalid unit: " + unit);
-		} //enum으로 변경 가능한지
+	public List<Map<String, Object>> getEmployeeStatsTrend(LocalDate from, LocalDate to, String unit) {
+
+		LocalDate oldestHireDate = employeeRepository.findOldestHireDate();
+		LocalDate startDate = (from != null) ? from : oldestHireDate;
+		LocalDate endDate = (to != null) ? to : LocalDate.now();
+
+		List<Object[]> results = employeeRepository.calculateStatsByUnit(startDate, endDate, unit);
+
+		List<Map<String, Object>> trendData = new ArrayList<>();
+		for (Object[] result : results) {
+			Map<String, Object> entry = new HashMap<>();
+			entry.put("date", result[0]);
+			entry.put("count", result[1]);
+			entry.put("totalEmployees", result[2]);
+			trendData.add(entry);
+		}
+
+		return trendData;
 	}
 
 	private void saveLog(String type, List<Map<String, Object>> logEntries, String employeeNumber, String memo) {
@@ -287,6 +280,39 @@ public class EmployeeServiceImpl implements EmployeeService {
 		entry.put("before", before);
 		entry.put("after", after);
 		return entry;
+	}
+
+	@Override
+	public List<Map<String, Object>> getEmployeeDistribution(String groupBy, EmployeeStatus status) {
+		List<Object[]> results;
+
+		switch (groupBy.toLowerCase()) {
+			case "department":
+				results = employeeRepository.countEmployeesGroupedByDepartment(status);
+				break;
+			case "position":
+				results = employeeRepository.countEmployeesGroupedByPosition(status);
+				break;
+			default:
+				throw new IllegalArgumentException("부서코드는 필수입니다. " + groupBy);
+		}
+
+		long totalCount = employeeRepository.countByStatus(status);
+
+		List<Map<String, Object>> distribution = new ArrayList<>();
+		for (Object[] result : results) {
+			String key = (String)result[0];
+			Long count = (Long)result[1];
+			double percentage = ((double)count / totalCount) * 100;
+
+			Map<String, Object> entry = new HashMap<>();
+			entry.put("groupKey", key);
+			entry.put("count", count);
+			entry.put("percentage", Math.round(percentage * 100.0) / 100.0);
+			distribution.add(entry);
+		}
+
+		return distribution;
 	}
 
 	private EmployeeResponseDto convertToDto(Employee employee) {
