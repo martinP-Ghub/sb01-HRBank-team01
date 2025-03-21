@@ -36,10 +36,11 @@ public class BackupController {
 		@RequestParam(required = false) Status status,
 		@RequestParam(required = false, name = "startedAtFrom") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startedAtFrom,
 		@RequestParam(required = false, name = "startedAtTo") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startedAtTo,
+		@RequestParam(required = false) String worker,
 		Pageable pageable
 	) {
 
-		CursorPageResponse<BackupResponse> backupDto = backupService.findAll(cursor, status, startedAtFrom, startedAtTo, pageable);
+		CursorPageResponse<BackupResponse> backupDto = backupService.findAll(cursor, status, startedAtFrom, startedAtTo, worker, pageable);
 		return ResponseEntity.ok(backupDto);
 	}
 
