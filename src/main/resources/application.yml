@@ -4,9 +4,10 @@ spring:
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/hrbank
-    username: hrbank_user
-    password: hrbank1234
+    url: postgresql://${{PGUSER}}:${{POSTGRES_PASSWORD}}@${{RAILWAY_PRIVATE_DOMAIN}}:5432/${{PGDATABASE}}
+  #    url: jdbc:postgresql://localhost:5432/${DB_NAME}
+  #    username: ${USER_NAME}
+  #    password: ${USER_PASSWORD}
 
   jpa:
     hibernate:
