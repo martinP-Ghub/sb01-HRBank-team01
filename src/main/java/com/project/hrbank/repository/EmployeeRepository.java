@@ -15,9 +15,9 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
 	boolean existsByEmail(String email);
 
-	//long countByStatus(EmployeeStatus status);
+	long countByStatus(EmployeeStatus status);
 
-	//Page<Employee> findByNameContainingOrEmailContaining(String name, String email, Pageable pageable);
+	Page<Employee> findByNameContainingOrEmailContaining(String name, String email, Pageable pageable);
 
 	@Query("SELECT COUNT(e) FROM Employee e WHERE " +
 		"(:status IS NULL OR e.status = :status) AND " +
