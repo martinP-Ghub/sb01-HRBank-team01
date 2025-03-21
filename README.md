@@ -66,19 +66,22 @@
 
 ```
 HRBank
-│── src/main/java/com/project/hrbank
-│   ├── config         # 설정 파일
-│   ├── controller     # API 컨트롤러
-│   ├── dto            # DTO 클래스
-│   ├── entity         # JPA 엔티티
-│   ├── repository     # JPA 리포지토리
-│   ├── mapper         # DTO <-> Entity 매핑
-│   ├── service        # 비즈니스 로직
-│   ├── util           # 유틸리티 클래스
-│── src/main/resources
-│   ├── application.yml  # 환경설정
-│── README.md          # 프로젝트 소개
-│── build.gradle       # Gradle 빌드 파일
+├── src
+│   └── main
+│       ├── java
+│       │   └── com.project.hrbank
+│       │       ├── config         # 설정 파일
+│       │       ├── controller     # API 컨트롤러
+│       │       ├── dto            # DTO 클래스
+│       │       ├── entity         # JPA 엔티티
+│       │       ├── repository     # JPA 리포지토리
+│       │       ├── mapper         # DTO <-> Entity 매핑
+│       │       ├── service        # 비즈니스 로직
+│       │       └── util           # 유틸리티 클래스
+│       └── resources
+│           └── application.yml    # 환경설정
+├── README.md                      # 프로젝트 소개
+└── build.gradle                   # Gradle 빌드 파일
 ```
 
 ## 🧑‍💻 [**프로젝트 관리 문서**](https://www.notion.so/1-1b586243d999805da7fbc6b1c3c01128?pvs=4)
