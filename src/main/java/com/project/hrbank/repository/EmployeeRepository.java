@@ -29,6 +29,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 		@Param("toDate") LocalDate toDate
 	);
 
+	long countByHireDateBetween(LocalDate fromDate, LocalDate toDate);
+
 	@Query("SELECT e FROM Employee e WHERE " +
 		"(:departmentName IS NULL OR e.departmentId = :departmentName) AND " +
 		"(:position IS NULL OR e.position = :position) AND " +
@@ -54,4 +56,5 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
 	@Query("SELECT COUNT(e) FROM Employee e WHERE YEAR(e.hireDate) = YEAR(CURRENT_DATE)")
 	long countEmployeesForCurrentYear();
+
 }

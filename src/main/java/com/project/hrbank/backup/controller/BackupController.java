@@ -15,6 +15,7 @@ import com.project.hrbank.backup.domain.Status;
 import com.project.hrbank.backup.dto.response.BackupDto;
 import com.project.hrbank.backup.dto.response.CursorPageResponseBackupDto;
 import com.project.hrbank.backup.service.BackupService;
+import com.project.hrbank.config.paging.DefaultSortField;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -27,11 +28,13 @@ public class BackupController {
 	private final BackupService backupService;
 
 	@GetMapping
+
 	public ResponseEntity<CursorPageResponseBackupDto> findAll(
 		@RequestParam(required = false) LocalDateTime cursor,
 		@RequestParam(required = false) Status status,
 		@RequestParam(required = false, name = "startedAtFrom") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startedAtFrom,
 		@RequestParam(required = false, name = "startedAtTo") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startedAtTo,
+		@DefaultSortField("startedAt")
 		Pageable pageable
 	) {
 
