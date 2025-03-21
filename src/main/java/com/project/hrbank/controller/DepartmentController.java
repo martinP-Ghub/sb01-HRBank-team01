@@ -31,6 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 public class DepartmentController {
 
 	private final DepartmentService departmentService;
+	private String lastSortField = null;
+	private String lastSortDirection = null;
 
 	@PostMapping
 	public ResponseEntity<DepartmentDto> createDepartment(@RequestBody DepartmentDto dto) {
@@ -56,6 +58,9 @@ public class DepartmentController {
 		@RequestParam(defaultValue = "asc") String sortDirection,
 		@RequestParam(defaultValue = "30") int size
 	) {
+		if (!sortField.equals(lastSortField) || !sortDirection.equals(lastSortDirection)) {
+			cursor = null;
+		}
 
 		String searchQuery = nameOrDescription != null && !nameOrDescription.trim().isEmpty()
 			? nameOrDescription.trim()
