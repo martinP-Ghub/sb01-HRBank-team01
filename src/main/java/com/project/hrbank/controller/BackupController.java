@@ -30,12 +30,12 @@ public class BackupController {
 	private final IpUtils ipUtils;
 
 	@GetMapping
+	@DefaultSortField("startedAt")
 	public ResponseEntity<CursorPageResponse<BackupResponse>> findAll(
 		@RequestParam(required = false) LocalDateTime cursor,
 		@RequestParam(required = false) Status status,
 		@RequestParam(required = false, name = "startedAtFrom") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startedAtFrom,
 		@RequestParam(required = false, name = "startedAtTo") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startedAtTo,
-		@DefaultSortField("startedAt")
 		Pageable pageable
 	) {
 
