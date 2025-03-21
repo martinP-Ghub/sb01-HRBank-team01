@@ -4,12 +4,12 @@ spring:
 
   datasource:
     driver-class-name: org.postgresql.Driver
-      #    url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}
-      #    username: ${PGUSER}
-    #    password: ${PGPASSWORD}
-    url: jdbc:postgresql://ballast.proxy.rlwy.net:41832/railway
-    username: postgres
-    password: dxmWKgVpXPkeIeSmPimQIjpALdfUskSK
+    url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}
+    username: ${PGUSER}
+    password: ${PGPASSWORD}
+  #    url: jdbc:postgresql://ballast.proxy.rlwy.net:41832/railway
+  #    username: postgres
+  #    password: dxmWKgVpXPkeIeSmPimQIjpALdfUskSK
   #    url: jdbc:postgresql://localhost:5432/${DB_NAME}
   #    username: ${USER_NAME}
   #    password: ${USER_PASSWORD}
