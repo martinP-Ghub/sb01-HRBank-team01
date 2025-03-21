@@ -78,7 +78,8 @@ public class EmployeesLogCsvFileProvider {
 			} while (employeePage.hasNext());
 
 			long fileSize = Files.size(employeesLogFilePath);
-			FileEntity fileEntity = new FileEntity(fileName, FileExtension.CSV.getDescription(), fileSize, employeesLogFilePath.getParent().toString());
+			FileEntity fileEntity = new FileEntity(fileName, FileExtension.CSV.getDescription(), fileSize, employeesLogFilePath.toString());
+
 			return Optional.of(fileEntity);
 		} catch (IOException saveException) {
 			logFileProvider.writeErrorLog(employeesLogFilePath, saveException);
