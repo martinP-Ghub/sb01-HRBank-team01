@@ -3,6 +3,10 @@ package com.project.hrbank.file.service;
 import java.io.IOException;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.project.hrbank.file.FileHandlerFactory;
@@ -12,8 +16,10 @@ import com.project.hrbank.file.repository.FileRepository;
 import com.project.hrbank.file.storage.FileStorage;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
 	private final FileRepository fileRepository;
@@ -84,10 +90,18 @@ public class FileServiceImpl implements FileService {
 	}
 
 	@Override
+	@Transactional(propagation = Propagation.REQUIRED)
 	public void deleteFile(Long fileId) {
-		FileEntity findEntity = find(fileId);
-		fileStorage.delete(findEntity.getId());
-		fileRepository.delete(findEntity);
-	}
+		FileEntity findEntity = fileRepository.findById(fileId)
+			.orElseThrow(() -> new IllegalArgumentException("파일을 찾을 수 없습니다: " + fileId));
 
+		fileRepository.delete(findEntity);
+
+		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+			@Override
+			public void afterCommit() {
+				fileStorage.delete(fileId); // 이제 이건 디스크 삭제만 담당하니까 안전
+			}
+		});
+	}
 }

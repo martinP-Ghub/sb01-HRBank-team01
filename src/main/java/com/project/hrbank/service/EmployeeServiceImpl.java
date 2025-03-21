@@ -1,6 +1,9 @@
 package com.project.hrbank.service;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,6 +19,10 @@ import com.project.hrbank.dto.request.EmployeeRequestDto;
 import com.project.hrbank.dto.response.EmployeeResponseDto;
 import com.project.hrbank.entity.Employee;
 import com.project.hrbank.entity.EmployeeStatus;
+import com.project.hrbank.file.entity.FileEntity;
+import com.project.hrbank.file.repository.FileRepository;
+import com.project.hrbank.file.service.FileService;
+import com.project.hrbank.file.storage.FileStorage;
 import com.project.hrbank.repository.EmployeeRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +36,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -44,6 +53,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	private final EmployeeRepository employeeRepository;
 	private final DepartmentService departmentService;
+	private final FileService fileService;
+	private final FileStorage fileStorage;
+	private final FileRepository fileRepository;
 	private static final Logger logger = LoggerFactory.getLogger(EmployeeServiceImpl.class);
 
 	@Override
@@ -63,9 +75,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 			.status(EmployeeStatus.ACTIVE)
 			.build();
 
-		if (profileImage != null && !profileImage.isEmpty()) {
-			Long profileImageId = saveProfileImage(profileImage);
-			employee.setProfileImageId(profileImageId);
+		try {
+			FileEntity fileEntity = fileService.saveMultipartFile(profileImage);
+			employee.setProfileImageId(fileEntity.getId());
+		}catch (IOException e) {
+			throw new RuntimeException(e.getMessage());
 		}
 
 		Employee savedEmployee = employeeRepository.save(employee);
@@ -189,6 +203,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		}
 	}
 
+	@Transactional
 	@Override
 	public void deleteEmployee(Long id) {
 		Employee employee = employeeRepository.findById(id)
@@ -211,7 +226,36 @@ public class EmployeeServiceImpl implements EmployeeService {
 			null));
 
 		saveLog("DELETED", logData, employee.getEmployeeNumber(), "직원 삭제");
-		employeeRepository.deleteById(id);
+
+		Long profileImageId = employee.getProfileImageId();
+		String filePath = null;
+
+		employeeRepository.delete(employee);
+
+		if (profileImageId != null) {
+			FileEntity fileEntity = fileRepository.findById(profileImageId)
+				.orElse(null);
+			if (fileEntity != null) {
+				filePath = fileEntity.getFilePath(); // 경로 미리 확보
+				fileRepository.delete(fileEntity);   // 메타 삭제
+			}
+		}
+
+
+		if (profileImageId != null) {
+			String finalFilePath = filePath;
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+				@Override
+				public void afterCommit() {
+					try {
+						Path path = Paths.get(finalFilePath);
+						Files.deleteIfExists(path);
+					} catch (IOException e) {
+						logger.warn("파일 삭제 실패: {}", finalFilePath, e);
+					}
+				}
+			});
+		}
 	}
 
 	private String generateEmployeeNumber() {
@@ -298,5 +342,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 			.profileImageId(employee.getProfileImageId())
 			.createdAt(employee.getCreatedAt())
 			.build();
+	}
+
+	@Override
+	public long countActiveEmployees() {
+		return 0;
 	}
 }
