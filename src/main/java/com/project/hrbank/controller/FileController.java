@@ -1,4 +1,4 @@
-package com.project.hrbank.file.controller;
+package com.project.hrbank.controller;
 
 import java.io.InputStream;
 
@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.project.hrbank.file.entity.FileEntity;
-import com.project.hrbank.file.service.FileService;
-import com.project.hrbank.file.storage.FileStorage;
+import com.project.hrbank.entity.FileEntity;
+import com.project.hrbank.service.FileService;
+import com.project.hrbank.util.storage.FileStorage;
 
 import lombok.RequiredArgsConstructor;
 

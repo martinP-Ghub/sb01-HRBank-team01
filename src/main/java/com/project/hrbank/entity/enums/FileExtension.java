@@ -1,4 +1,4 @@
-package com.project.hrbank.file.entity.enums;
+package com.project.hrbank.entity.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

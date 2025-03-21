@@ -1,4 +1,4 @@
-package com.project.hrbank.file.storage;
+package com.project.hrbank.util.storage;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -10,9 +10,9 @@ import java.nio.file.Paths;
 
 import org.springframework.stereotype.Service;
 
-import com.project.hrbank.file.FileHandlerFactory;
-import com.project.hrbank.file.entity.FileEntity;
-import com.project.hrbank.file.repository.FileRepository;
+import com.project.hrbank.util.factory.FileHandlerFactory;
+import com.project.hrbank.entity.FileEntity;
+import com.project.hrbank.repository.FileRepository;
 
 import lombok.RequiredArgsConstructor;
 

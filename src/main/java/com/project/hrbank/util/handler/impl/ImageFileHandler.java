@@ -1,4 +1,4 @@
-package com.project.hrbank.file.handler.impl;
+package com.project.hrbank.util.handler.impl;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -7,8 +7,8 @@ import java.nio.file.Paths;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.project.hrbank.file.entity.FileEntity;
-import com.project.hrbank.file.handler.FileHandler;
+import com.project.hrbank.entity.FileEntity;
+import com.project.hrbank.util.handler.FileHandler;
 
 public class ImageFileHandler implements FileHandler {
 

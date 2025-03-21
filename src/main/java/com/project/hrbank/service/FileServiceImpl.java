@@ -1,4 +1,4 @@
-package com.project.hrbank.file.service;
+package com.project.hrbank.service;
 
 import java.io.IOException;
 
@@ -9,11 +9,11 @@ import org.springframework.transaction.support.TransactionSynchronizationAdapter
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.project.hrbank.file.FileHandlerFactory;
-import com.project.hrbank.file.entity.FileEntity;
-import com.project.hrbank.file.handler.FileHandler;
-import com.project.hrbank.file.repository.FileRepository;
-import com.project.hrbank.file.storage.FileStorage;
+import com.project.hrbank.util.factory.FileHandlerFactory;
+import com.project.hrbank.entity.FileEntity;
+import com.project.hrbank.util.handler.FileHandler;
+import com.project.hrbank.repository.FileRepository;
+import com.project.hrbank.util.storage.FileStorage;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

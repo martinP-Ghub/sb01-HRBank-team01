@@ -19,9 +19,8 @@ import com.project.hrbank.dto.request.EmployeeRequestDto;
 import com.project.hrbank.dto.response.EmployeeResponseDto;
 import com.project.hrbank.entity.Employee;
 import com.project.hrbank.entity.EmployeeStatus;
-import com.project.hrbank.file.entity.FileEntity;
-import com.project.hrbank.file.repository.FileRepository;
-import com.project.hrbank.file.service.FileService;
+import com.project.hrbank.entity.FileEntity;
+import com.project.hrbank.repository.FileRepository;
 import com.project.hrbank.repository.EmployeeRepository;
 
 import lombok.RequiredArgsConstructor;

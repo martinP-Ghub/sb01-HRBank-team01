@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import com.project.hrbank.entity.base.BaseTimeEntity;
-import com.project.hrbank.file.entity.FileEntity;
+import com.project.hrbank.entity.FileEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
