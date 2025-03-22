@@ -39,8 +39,7 @@ public class BackupService {
         startedAtFrom = Optional.ofNullable(startedAtFrom).orElse(POSTGRESQL_MIN_TIMESTAMP);
         startedAtTo = Optional.ofNullable(startedAtTo).orElse(LocalDateTime.now());
 
-        String likeWorker = (worker == null || worker.isBlank()) ? null : "%" + worker + "%";
-        Page<Backup> page = backupRepository.findAllBy(cursor, status, startedAtFrom, startedAtTo, likeWorker, pageable);
+        Page<Backup> page = backupRepository.findAllBy(cursor, status, startedAtFrom, startedAtTo, worker, pageable);
 
         List<BackupResponse> content = getBackupContents(page);
 

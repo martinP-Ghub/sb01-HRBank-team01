@@ -36,7 +36,7 @@ public class BackupController {
 		@RequestParam(required = false) Status status,
 		@RequestParam(required = false, name = "startedAtFrom") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startedAtFrom,
 		@RequestParam(required = false, name = "startedAtTo") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startedAtTo,
-		@RequestParam(required = false) String worker,
+		@RequestParam(required = false, defaultValue = "") String worker,
 		Pageable pageable
 	) {
 
