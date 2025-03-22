@@ -21,7 +21,7 @@ public interface BackupRepository extends JpaRepository<Backup, Long> {
                     + "AND (:status IS NULL OR b.status = :status) "
                     + "AND b.startedAt >= :startedAtFrom "
                     + "AND b.startedAt <= :startedAtTo "
-                    + "AND (:worker IS NULL OR b.worker LIKE :worker) "
+//                    + "AND (:worker IS NULL OR b.worker LIKE :worker) " TODO 조건 추가 시 배포 서버 에러 발생
     )
     Page<Backup> findAllBy(
             @Param("cursor") LocalDateTime cursor,
